@@ -15,6 +15,24 @@ npm install <packageName> (for specific packages)
 
 *** npm install <packageName1> <packageName2> <packageName3> (multiple packages at once)
 
+
+ADDING .gitignore
+
+While creating the project manually, it wont be created automatically so please follow the steps,
+
+-- touch .gitignore (to Terminal and before select the correct path)
+-- Add the following keywords inside the .gitignore
+
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+.DS_Store
+
+
+
 COMMONJS VS ES MODULES
 
 CommonJS and ES Modules are two different systems for sharing code between
