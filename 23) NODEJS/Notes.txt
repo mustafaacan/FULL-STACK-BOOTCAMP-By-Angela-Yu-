@@ -1,0 +1,57 @@
+
+For more detailed Information  
+
+https://nodejs.org/tr
+
+
+Once try to start a new project, to reach all the necessary external node modules,
+please use,
+
+npm init (npm init will be asking for project utils)
+
+npm install or npm i (shortly)
+
+npm install <packageName> (for specific packages)
+
+*** npm install <packageName1> <packageName2> <packageName3> (multiple packages at once)
+
+COMMONJS VS ES MODULES
+
+CommonJS and ES Modules are two different systems for sharing code between
+JavaScript files.
+
+CommonJS
+
+CommonJS is Node.js's traditional module system.
+
+const fs = require("fs");
+module.exports = myFunction;
+
+- It uses require() and module.exports.
+- Files can use the .cjs extension.
+- It can be enabled with "type": "commonjs" in package.json.
+- require() generally loads modules synchronously.
+- It does not support top-level await.
+
+ES Modules (ESM)
+
+ES Modules are JavaScript's modern standard module system.
+
+import { readFile } from "node:fs/promises";
+export default myFunction;
+
+- It uses import and export.
+- Files can use the .mjs extension.
+- To use ESM in .js files, add "type": "module" to package.json.
+- It is supported by browsers and Node.js.
+- It supports top-level await.
+- It is generally preferred for modern projects.
+
+ES Module example:
+
+import { writeFile, readFile } from "node:fs/promises";
+
+CommonJS equivalent:
+
+const { writeFile, readFile } = require("node:fs/promises");
+
