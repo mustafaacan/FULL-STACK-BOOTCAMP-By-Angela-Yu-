@@ -1,0 +1,71 @@
+
+Node js --> Runtime environment for js projects
+
+Express js --> Framework to create backend for web sites
+
+By the combination of nodeJS and ExpressJS, well developed backend projects can be published
+
+For more detailed Express docs --> https://expressjs.com/en/
+
+
+EXPRESS ROUTING VS REACT ROUTER
+
+The main difference is where the routing takes place.
+
+Express routing works on the server side:
+
+app.get("/users", (req, res) => {
+  res.send("Users");
+});
+
+app.post("/users", (req, res) => {
+  // Create a new user
+});
+
+Every request is sent to the server. Express can:
+
+- Handle HTTP methods such as GET, POST, PUT, and DELETE
+- Communicate with a database
+- Perform authentication and authorization
+- Return HTML, JSON, files, or status codes
+- Define backend and API routes
+
+React Router works on the client side, inside the browser:
+
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/users" element={<Users />} />
+</Routes>
+
+React Router can:
+
+- Decide which React component should be displayed for a URL
+- Change the visible page without requesting a completely new HTML document
+- Manage navigation inside a Single-Page Application (SPA)
+
+React Router does not directly handle HTTP GET or POST requests, communicate
+with a database, or replace a backend server.
+
+They are commonly used together:
+
+1. React Router displays the <Users /> component for the /users URL.
+2. The React application sends a GET request to /api/users.
+3. Express receives that request and gets the users from the database.
+4. Express returns the data as JSON, and React displays it.
+
+When a user submits a form, the flow may look like this:
+
+React form --> POST /api/users --> Express --> Database
+
+In short:
+
+React Router answers: "Which screen should the user see?"
+Express routing answers: "How should the server respond to this HTTP request?"
+
+They are not alternatives to each other. In a full-stack React application,
+React Router usually manages frontend navigation, while Express manages backend
+requests and API endpoints.
+
+Important: If the browser refreshes a React Router URL such as /users, the
+request first reaches the server. The server must therefore be configured to
+return the React application's index.html file for frontend routes.
