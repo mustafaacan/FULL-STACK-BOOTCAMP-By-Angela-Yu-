@@ -8,11 +8,32 @@ import inquirer from "inquirer";
 import { image } from "qr-image";
 import fs from "fs";
 import generateName from "sillyname";
+import { json } from "stream/consumers";
 
 const targetPath = new URL("./message.txt", import.meta.url);
 
-const validateURL = (url) => {
-  return url.includes("@") && url.includes(".");
+const updateURLList = (obj) => {
+  fs.readFile("LatestURL.txt", "utf8", (err, data) => {
+    if (err) {
+      console.log("Error while File Reading:", err);
+      return;
+    }
+    let latestUrlObj = {};
+    if (data.trim() !== "") {
+      latestUrlObj = JSON.parse(data);
+    }
+    const updatedObj = JSON.stringify({ ...latestUrlObj, ...obj }, null, 2);
+
+    fs.writeFile("LatestURL.txt", updatedObj, (err) => {
+      if (err) {
+        console.log("Error while updating the file:", err);
+        return;
+      }
+
+      console.log("The file has been updated");
+      console.log("QR code generated");
+    });
+  });
 };
 
 inquirer
@@ -21,21 +42,15 @@ inquirer
   ])
   .then((answers) => {
     const url = answers.url;
-    if (validateURL(url)) {
-      var qr_svg = image(url);
-      const fileName = generateName() + ".png";
-      const targetPath = new URL(`./QRCODES/${fileName}`, import.meta.url);
 
-      console.log("Generated File Name: ", fileName);
-      qr_svg.pipe(fs.createWriteStream(targetPath));
-      fs.writeFile("LatestURL.txt", url, (err) => {
-        if (err) throw err;
-        console.log("The file has been saved!");
-      });
-      console.log("QR code generated");
-    } else {
-      console.log("Invalid URL: ", answers.url);
-    }
+    var qr_svg = image(url);
+    const fileName = generateName() + ".png";
+    const targetPath = new URL(`./QRCODES/${fileName}`, import.meta.url);
+
+    console.log("Generated File Name: ", fileName);
+    qr_svg.pipe(fs.createWriteStream(targetPath));
+    const createdObj = { [fileName]: url };
+    updateURLList(createdObj);
   })
   .catch((error) => {
     console.log(error);

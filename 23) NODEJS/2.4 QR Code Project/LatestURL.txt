@@ -1,1 +1,4 @@
-mustafa@can.com
+{
+  "Fossilseed Viper.png": "mus@can.com",
+  "Candleroar Bite.png": "www.youtube.com"
+}
