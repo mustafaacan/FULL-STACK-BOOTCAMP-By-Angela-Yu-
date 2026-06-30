@@ -7,6 +7,15 @@ By the combination of nodeJS and ExpressJS, well developed backend projects can 
 
 For more detailed Express docs --> https://expressjs.com/en/
 
+** YOU CAN ACTIVATE THE EXPRESS SERVER 
+1. By entering "node index.js" on terminal (before adjust your terminal path correctly)
+2. By entering "npm run start" or shortly "npm start" (the equivalance already added inside the package.json)
+
+
+** BEFORE ASSIGN ANY PORT, PLEASE CHECK WHICH PORTS ARE USING EXTERNALLY BY USING BASH COMMAND BELOW
+
+sudo lsof -i -P -n | grep LISTEN (FOR MacOS, user password needed)
+
 
 EXPRESS ROUTING VS REACT ROUTER
 
