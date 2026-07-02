@@ -195,3 +195,52 @@ STATUS CODES
 5. Server Error --> 500-599
 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
+
+
+MIDDLEWARES
+
+Middleware is a function that runs between receiving a request and sending a
+response. It can process the request, modify the request or response objects,
+end the request-response cycle, or pass control to the next function.
+
+The general structure of an Express middleware function is:
+
+function middleware(req, res, next) {
+  // Process the request
+  next(); // Continue to the next middleware or route handler
+}
+
+Example:
+
+app.use((req, res, next) => {
+  console.log(req.method, req.url);
+  next();
+});
+
+app.get("/", (req, res) => {
+  res.send("Home Page");
+});
+
+The request flow is:
+
+Request --> Middleware --> Route Handler --> Response
+
+Middleware is commonly used for:
+
+- Logging requests
+- Checking authentication and authorization
+- Parsing incoming data, for example with express.json()
+- Handling errors
+- Adding information to the req or res object
+
+If the middleware does not send a response, it must call next(). Otherwise, the
+request will not continue to the next middleware or route handler and may remain
+pending.
+
+Before the backend ops, middlewares checking the incoming request's contents,
+authentication or even verification. They decide that if incoming request suitable
+or not for the operation
+
+Useful especially for Auth based ops or DB related ops
+for instance, system should be verify that the provided body is suitable to update the 
+DB properly. (For instance, all the required fields are not empty or types are correct)

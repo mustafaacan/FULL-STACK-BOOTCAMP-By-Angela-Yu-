@@ -3,7 +3,9 @@ import express from "express";
 const app = express();
 const port = 3001;
 
-let variable = "Test";
+app.use(express.json()); // as middleware
+
+let variable;
 
 // *********************
 // Let’s practice using Postman. Make sure your server is running with nodemon.
@@ -18,7 +20,11 @@ app.get("/", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  res.sendStatus(201);
+  const { newVariable } = req.body;
+  console.log("Old value: ", variable);
+  console.log("New Value: ", newVariable);
+  variable = newVariable;
+  res.status(201).json({ variable });
 });
 
 app.put("/user/angela", (req, res) => {
