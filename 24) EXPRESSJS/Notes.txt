@@ -7,14 +7,27 @@ By the combination of nodeJS and ExpressJS, well developed backend projects can 
 
 For more detailed Express docs --> https://expressjs.com/en/
 
+
 ** YOU CAN ACTIVATE THE EXPRESS SERVER 
 1. By entering "node index.js" on terminal (before adjust your terminal path correctly)
 2. By entering "npm run start" or shortly "npm start" (the equivalance already added inside the package.json)
+3. You can use npm run startWithNodemon to activete node with nodemon tool
+
+
+NODEMON
+
+A tool that detects the changes and refresh the node app automatically. 
+WITHOUT NODEMON, AFTER EACH CHANGES, SERVER SHOULD BE RESTARTED MANUALLY
+
+To install 
+npm i -g nodemon (for global usage)
+
 
 
 ** BEFORE ASSIGN ANY PORT, PLEASE CHECK WHICH PORTS ARE USING EXTERNALLY BY USING BASH COMMAND BELOW
 
 sudo lsof -i -P -n | grep LISTEN (FOR MacOS, user password needed)
+
 
 
 EXPRESS ROUTING VS REACT ROUTER
@@ -78,3 +91,107 @@ requests and API endpoints.
 Important: If the browser refreshes a React Router URL such as /users, the
 request first reaches the server. The server must therefore be configured to
 return the React application's index.html file for frontend routes.
+
+
+HTTP REQUEST 
+
+1. GET --> Requesting Resource 
+2. POST --> Sending Resource 
+3. PUT --> Updates the whole resource
+4. PATCH --> (patchs up) updates determined areas only
+5. DELETE --> Delete resources (from client to server side)
+
+
+ENDPOINTS
+
+URI, URL, path, and endpoint are related, but they do not mean exactly the same thing.
+
+URI (Uniform Resource Identifier)
+
+A URI is a general identifier for a resource. It tells us which resource we are
+referring to. URL is one type of URI.
+
+Example URI:
+
+https://example.com/about
+
+URL (Uniform Resource Locator)
+
+A URL identifies a resource and tells us where it is located and how to access it.
+
+Example URL:
+
+https://example.com/about
+
+In this URL:
+
+- https is the protocol.
+- example.com is the host.
+- /about is the path.
+
+Every URL is a URI, but not every URI is necessarily a URL.
+
+Path
+
+A path identifies a location inside an application or website.
+
+Example path:
+
+/about
+
+In Express, this path can be used to define a route:
+
+app.get("/about", (req, res) => {
+  res.send("About Page!");
+});
+
+Endpoint
+
+An endpoint is a location where a server receives a request. In an HTTP API, an
+endpoint is commonly described using an HTTP method and a path or full URL.
+
+Example endpoint:
+
+GET /about
+
+app.get("/about", (req, res) => {
+  res.send("About Page!");
+});
+
+In this example:
+
+- GET is the HTTP method.
+- /about is the path.
+- GET /about is the endpoint.
+- https://example.com/about is the full URL.
+- When the server receives this request, it responds with "About Page!".
+
+The same path can be used by different endpoints because the HTTP methods are
+different:
+
+GET /users       --> Get the users
+POST /users      --> Create a new user
+DELETE /users/5  --> Delete the user with the ID 5
+
+In short:
+
+- URI identifies a resource.
+- URL is a URI that also shows where the resource is and how to access it.
+- Path is the part of the URL that comes after the host.
+- Endpoint is where the server accepts a specific request, commonly represented
+  by an HTTP method and a path.
+
+If the server does not have a matching endpoint, Express may respond with:
+
+Cannot GET /about
+
+
+STATUS CODES 
+
+1. Informational Response --> 100-199
+2. Successful Response --> 200-299
+3. Redirectional Message --> 300 - 399
+4. Client Error --> 400 - 499
+5. Server Error --> 500-599
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status

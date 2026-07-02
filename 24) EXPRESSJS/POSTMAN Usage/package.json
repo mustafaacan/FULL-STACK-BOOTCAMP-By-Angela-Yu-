@@ -1,0 +1,20 @@
+{
+  "name": "postman-usage",
+  "version": "1.0.0",
+  "description": "Postman tests for HTTP status",
+  "license": "ISC",
+  "author": "Mustafa Can",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"node index.js\" \"wait-on http://localhost:3001 && open http://localhost:3001\"",
+    "startWithNodemon": "concurrently \"nodemon index.js\" \"wait-on http://localhost:3001 && open http://localhost:3001\""
+  },
+  "dependencies": {
+    "concurrently": "^10.0.3",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14",
+    "wait-on": "^9.0.10"
+  }
+}
