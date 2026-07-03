@@ -197,7 +197,10 @@ STATUS CODES
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
 
 
+
 MIDDLEWARES
+
+all available middlewares for express --> https://expressjs.com/en/resources/middleware
 
 Middleware is a function that runs between receiving a request and sending a
 response. It can process the request, modify the request or response objects,
@@ -244,3 +247,24 @@ or not for the operation
 Useful especially for Auth based ops or DB related ops
 for instance, system should be verify that the provided body is suitable to update the 
 DB properly. (For instance, all the required fields are not empty or types are correct)
+
+
+
+USAGE of bodyParser (external library) or express.urlencoded (internal) MIDDLEWARES
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+
+By the one of them, incoming POST data from Postman / Swagger or Form structure can be addressed inside of "req.body"
+
+For instane, when we send from Postman
+
+pet=cat
+street=green
+
+Express app can convert it to
+
+{ pet: "cat", street: "green" }
+
+
+MORGAN LOGGER FOR EXPRESS ()
