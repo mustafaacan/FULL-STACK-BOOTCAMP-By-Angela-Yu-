@@ -10,19 +10,8 @@ const port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// ON THE POSTMAN, (be carefull about selected body types and header content type)
-// WORKSPACE : APITestingToLearn
-// COLLECTION NAME : Postman test (Angela Yu Course)
-// METHOD NAME: testForMiddleware
-
-// For bigger projects, backend usually sends data instead of HTML and client side (REACT ETC.) by using the data and components,
-// generates the necessary UI
-app.get("/", (req, res) => {
-  console.log("The path of the html index: ", __dirname);
-  res.sendFile(__dirname + "/public/index.html");
-});
-
-app.post("/submit", (req, res) => {
+// CUSTOM MIDDLEWARE
+function validateSubmit(req, res, next) {
   console.log("Requested body", req.body);
 
   // BY the using UI, some security policies can be satisfied. But, when someone try to post any data from tools such postman and
@@ -37,16 +26,44 @@ app.post("/submit", (req, res) => {
     console.log(valueCheck);
     if (valueCheck.length === 2) {
       console.log("Body totally suitable");
+      return res.status(200).json({
+        message: "Successful",
+      });
     } else {
       console.log("Body includes empty values");
+      res.message = "Body includes empty values";
+      return res.status(400).json({
+        message: "Body includes empty values",
+      });
     }
   } else {
     console.log(
       "Incoming body keys should include 'pet' and 'street' in the same time",
     );
+    ("Incoming body keys should include 'pet' and 'street' in the same time");
+    res.status(400).json({
+      message:
+        "Incoming body keys should include 'pet' and 'street' in the same time",
+    });
   }
+}
 
-  res.redirect("/");
+// ON THE POSTMAN, (be carefull about selected body types and header content type)
+// WORKSPACE : APITestingToLearn
+// COLLECTION NAME : Postman test (Angela Yu Course)
+// METHOD NAME: testForMiddleware
+
+// For bigger projects, backend usually sends data instead of HTML and client side (REACT ETC.) by using the data and components,
+// generates the necessary UI
+app.get("/", (req, res) => {
+  console.log("The path of the html index: ", __dirname);
+  res.sendFile(__dirname + "/public/index.html");
+});
+
+app.post("/", validateSubmit, (req, res) => {
+  return res.status(200).json({
+    message: "Successful",
+  });
 });
 
 app.listen(port, () => {

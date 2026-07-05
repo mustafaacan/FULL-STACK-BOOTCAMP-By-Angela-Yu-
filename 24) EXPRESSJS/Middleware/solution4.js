@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 3000;
-var bandName = "";
+let bandName = "";
 
 app.use(bodyParser.urlencoded({ extended: true }));
 

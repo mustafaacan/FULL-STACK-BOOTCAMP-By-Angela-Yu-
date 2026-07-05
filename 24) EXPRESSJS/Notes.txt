@@ -267,4 +267,64 @@ Express app can convert it to
 { pet: "cat", street: "green" }
 
 
-MORGAN LOGGER FOR EXPRESS ()
+MORGAN LOGGER FOR EXPRESS
+
+An middleware that logging all the incoming requests and provided responses
+
+
+
+NEXT() function
+
+This is a function used within middleware that specifies under what conditions the middleware flow ends
+and the general flow (backend operations such as GET/POST) continues.
+
+CRITICAL POINT : flow can continue through the next middleware of route handler
+
+USAGE EXAMPLE 1: (for the all routers)
+
+function logger(req, res, next) {
+  console.log("Request Method: ", req.method);
+  console.log("Request URL: ", req.url);
+  next();
+}
+
+app.use(logger); // necessary
+
+
+
+USAGE EXAMPLE 2: (for specific router)
+
+Caution: system will check all the defined middlewares according the order from left to right
+
+
+
+app.use(express.urlencoded({ extended: true }));
+
+function validateLogin(req, res, next) {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).send("Email & password mandatory.");
+  }
+
+  next();
+}
+
+function checkPasswordLength(req, res, next) {
+  if (req.body.password.length < 6) {
+    return res.status(400).send("At least 6 chars.");
+  }
+
+  next();
+}
+
+function loginHandler(req, res) {
+  res.send("logged in successfully");
+}
+
+app.post(
+  "/login",
+  validateLogin,
+  checkPasswordLength,
+  loginHandler
+);
