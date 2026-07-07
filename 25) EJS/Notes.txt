@@ -1,1 +1,9 @@
 
+EJS --> Templating language
+
+Using EJS is more clear and easy way to manage the frond End activities
+than sending files or HTML structures
+
+For instace using res.sendFile(...) provides a static approach
+
+We can use res.render(...) to provide EJS key-value pairs
