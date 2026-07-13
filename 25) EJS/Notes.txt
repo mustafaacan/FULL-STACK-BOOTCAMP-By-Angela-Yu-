@@ -7,3 +7,25 @@ than sending files or HTML structures
 For instace using res.sendFile(...) provides a static approach
 
 We can use res.render(...) to provide EJS key-value pairs
+
+
+EJS TAGS
+
+<%= %>  --> output is variable
+
+<% %> --> output is JS executable code  (console.log("Hello") etc.)
+CRITICAL POINT: No output will be appear on screen
+
+<%- %> --> render html  (<h1>Hello<h1> etc)
+
+<%# %> --> stop execution usually for the comments
+
+
+<%- include('<FILENAME.ejs>') %> --> insert another EJS files (will be given as URL)
+
+
+
+*** CAUTION : WHEN THE RENDER DATA SENT AS OBJECT, DO NOT USE DATA.KEY, USE KEY DIRECTLY 
+
+
+
