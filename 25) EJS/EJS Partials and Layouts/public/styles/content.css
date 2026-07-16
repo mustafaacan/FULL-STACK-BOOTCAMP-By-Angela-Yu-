@@ -34,6 +34,14 @@ p {
   object-fit: cover;
   border-radius: 50%;
 }
+
+.check{
+  height: 40px;
+  width: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 form {
   margin-top: 50px;
 }

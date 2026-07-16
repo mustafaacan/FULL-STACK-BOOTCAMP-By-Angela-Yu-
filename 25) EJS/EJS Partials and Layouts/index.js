@@ -4,11 +4,10 @@ import bodyParser from "body-parser";
 const app = express();
 const port = 3000;
 
+// MIDDLEWARES
 app.use(express.static("./public"));
-
 // To read HTML form data
 app.use(express.urlencoded({ extended: true }));
-
 // To read JSON data
 app.use(express.json());
 
@@ -29,7 +28,7 @@ app.post("/submit", (req, res) => {
   console.log("Entered Name: ", data["name"]);
   console.log("Entered Email: ", data["email"]);
   console.log("Entered Text: ", data["text"]);
-  res.redirect("/");
+  res.render("confirmationPage.ejs");
 });
 
 app.listen(port, () => {
