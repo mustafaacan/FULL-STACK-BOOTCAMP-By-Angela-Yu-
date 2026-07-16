@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Name Letters</title>
+  </head>
+
+  <% if (locals.fn) {%>
+    <h1> There are <%= fn.length %> letters in your entered name & surname </h1>
+  <% } else {%>
+    <h1> Please enter your name below  </h1>
+  <% } %>
+
+  <body>
+    <form action="/submit" method="POST">
+      <input type="text" name="fName" placeholder="First name"/>
+      <input type="text" name="lName" placeholder="Last name"/>
+      <input type="submit" value="OK" />
+    </form>
+  </body>
+</html>

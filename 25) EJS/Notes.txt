@@ -28,4 +28,30 @@ CRITICAL POINT: No output will be appear on screen
 *** CAUTION : WHEN THE RENDER DATA SENT AS OBJECT, DO NOT USE DATA.KEY, USE KEY DIRECTLY 
 
 
+WHAT IF ,THERE IS NO ANY DATA ?
 
+for this cases, inside the EJS, we can use locals.<KEYWORD> with if clause
+
+this keyword is a built-in keyword
+
+<%= fruits %>  -->  <% if (locals.fruits) {%> ....
+
+
+
+LAYOUT AND PARTIAL TEMPLATE
+
+To use the locale styling css files or images, express static should be used
+
+app.use(express.static(<"public" folder path>));
+
+static files usually deploy under the "public" folder so path for the public folder is enough for the define all static elements
+located under the public folder
+
+public/
+└── styles/
+    └── main.css
+
+On the other hand, for cdn structures, we do not need to use static usage
+
+for partial usage, we can use the structure below
+<%- include('<FILENAME.ejs>') %> --> insert another EJS files (will be given as URL)
