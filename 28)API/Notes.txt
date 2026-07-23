@@ -1,0 +1,33 @@
+
+APPLICATION PROGRAM INTERFACE
+
+These are structures used for data exchange between programs with different or similar architectures. Kind of Brigde
+One of the best things about it is that we don’t need to worry about the architecture or database structure of the applications we’re working with.
+We just need to know how to send a request and what the response will be.
+
+IOT architectures also can use API structures.
+
+
+
+SOME API TYPES
+
+1. GraphQL (QUERYING LANGUAGE) --> It is an open-source data querying and processing language developed for APIs 
+               It allows clients to request only the data they need—and nothing more—from the server.
+               client receives only the data it needs.
+               Scenario: Requesting only a user's name and email address
+
+2. SOAP (PROTOCOL) --> (Simple Object Access Protocol) is an XML-based communication protocol that enables applications 
+             written in different platforms and languages to securely exchange data over a network.
+             In corporate systems that require strict rules and high security.
+             Scenario: A bank sends a request to transfer funds to another bank in XML format.
+
+3. REST API (ARCHITECTURE / USING HTTP PROTOCOL) --> It is an architecture that enables different software systems to communicate with each other 
+                               securely over the Internet according to standard rules. It allows data (typically in JSON format) 
+                               to be sent and received using the HTTP PROTOCOL. 
+                               Common in simple web and mobile apps.
+                               Scenario: Retrieve user number 5 as JSON using the GET /users/5 request.
+
+4. gRPC (RPC FRAMEWORK) --> It is an open-source Remote Procedure Call (RPC) framework developed by Google that enables 
+            high-performance, low-latency communication between different programming languages.
+            For fast communication between microservices.
+            Scenario: Microservices quickly querying inventory information.
