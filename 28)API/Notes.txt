@@ -1,5 +1,5 @@
 
-APPLICATION PROGRAM INTERFACE
+APPLICATION PROGRAM INTERFACE (API)
 
 These are structures used for data exchange between programs with different or similar architectures. Kind of Brigde
 One of the best things about it is that we don’t need to worry about the architecture or database structure of the applications we’re working with.
@@ -9,7 +9,16 @@ IOT architectures also can use API structures.
 
 
 
-SOME API TYPES
+
+API TYPES
+1. API TYPES ACCORDING TO SCTRUCTURE
+2. API TYPES ACCORDING TO USAGE PURPOSE
+
+
+
+
+
+API TYPES ACCORDING TO SCTRUCTURE
 
 1. GraphQL (QUERYING LANGUAGE) --> It is an open-source data querying and processing language developed for APIs 
                It allows clients to request only the data they need—and nothing more—from the server.
@@ -31,3 +40,105 @@ SOME API TYPES
             high-performance, low-latency communication between different programming languages.
             For fast communication between microservices.
             Scenario: Microservices quickly querying inventory information.
+
+
+
+
+
+
+API TYPES ACCORDING TO USAGE PURPOSE
+
+1. Public/Open API --> These are APIs that are available to everyone (including external developers) 
+                        over the Internet and are typically accessible via authentication
+                        Example: A weather application retrieves Istanbul’s current temperature from a weather API
+
+2. Private/Internal API --> These are APIs that are used solely for data sharing within a company’s or organization’s 
+                            internal departments and systems and are not accessible externally
+                            Example: A company’s internal application retrieves employee leave information from its database
+
+
+3. Partner API --> This is a type of API provided to authorized individuals for the purpose of securely 
+                    exchanging data between the systems of companies that have specific business partners
+                    An e-commerce platform checks delivery information through its shipping partner’s API
+
+4. Composite API --> These are APIs that combine multiple APIs or data sources into a single call to meet 
+                    complex system requirements
+                    Example: A single API request checks inventory, processes the payment, and creates a shipment.
+
+
+
+
+
+
+AUTHENTICATION vs. AUTHORIZATION
+
+Authentication: Answers the question “Who are you?” It verifies the user’s identity.
+Example: Logging in with a username and password.
+
+Authorization: Answers the question “What are you allowed to do?” It checks the authenticated user’s permissions.
+Example: Only an admin can delete another user’s account.
+
+Authentication verifies identity; authorization verifies permissions.
+
+Login → Authentication → Authorization → Resource
+
+Real-life example: Using an ID card to enter a company building is authentication. 
+Being allowed to enter only specific rooms is authorization.
+
+
+
+
+** The main advantage of POSTMAN, for the API client / HTTP request can be simulated without having any web based structure
+such front end design or express based backend
+
+
+
+RATE LIMITING
+
+a technique used to control the number of requests a client can make to a server within a set time period.
+Usually remaining rate limit can be seen inside the response's header.
+
+Request tracking: The server identifies clients using an IP address, user ID, or API key.
+Threshold comparison: It checks recent usage against the allowed maximum.
+Rejection: If a client goes over the limit, the server blocks extra requests and sends back a "429 Too Many Requests" status code
+
+
+
+
+ENDPOINT, PATH PARAMETERS, QUERY PARAMETERS
+
+For Example --> https://bored-api.appbrewery.com/
+
+
+ENDPOINT
+
+baseURL / Endpoint for example 
+
+https://api.example.com/users --> https://api.example.com (baseURL), /users (endpoint)
+
+
+
+QUERY PARAMETERS
+
+** Critical point : Do Not Forget "?" before query parameter(s)
+
+Using to filtering, sorting, searching or paginationing
+
+baseURL / Endpoint ? query = value (single) or baseURL / Endpoint ? query1 = value & query2 = value & query3 = value (multiple)
+
+https://api.example.com/products?category=electronics&limit=10
+
+https://api.example.com/users?country=Turkey&sort=name&page=2
+
+
+
+PATH PARAMETERS
+
+defines a specific resources
+
+baseURL / Endpoint / path parameter
+
+https://api.example.com/users/42 --> response will be user with id 42, warning message (usually 404 not found) or empty user info
+
+404 not found --> user does not existing
+400 bad request --> path type should be integer instead of string 
