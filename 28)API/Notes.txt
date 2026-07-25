@@ -142,3 +142,37 @@ https://api.example.com/users/42 --> response will be user with id 42, warning m
 
 404 not found --> user does not existing
 400 bad request --> path type should be integer instead of string 
+
+
+
+
+
+
+JSON (JS Object Notation)
+
+To format the data sent over internet for more readbility, serialized (smaller size) and easier way. Structured by key-value pairs
+
+** It seems as object. However, it should be considered a kind of string.
+
+JS Object Example --> definetion needed
+
+const jsObject = {
+    'k1' : value,
+    'k2' : value
+}
+
+JSON Example
+
+{
+    'k1' : value,
+    'k2' : value
+}
+
+JSON - JS OBJECT CONVERSION
+
+JS to JSON --> const JsonData = JSON.stringify(JSdata) --> the result will be act like string.
+
+JSON to JS --> const jsObject = JSON.parse(JSONdata) --> Since incoming JSON acts like string, without convert it to JS 'object'
+                                                         we cannot use object built in functions
+
+** Without comversion, json data cannot be managed inside the JS code 
