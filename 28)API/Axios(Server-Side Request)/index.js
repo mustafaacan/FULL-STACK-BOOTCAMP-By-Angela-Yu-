@@ -5,6 +5,11 @@ import axios from "axios";
 const app = express();
 const port = 3000;
 
+// FOR AXIOS DOCUMENTATION
+// https://axios.rest/pages/getting-started/examples/commonjs.html
+// For this example, we used axios with async mechanism but most modern way is using it as
+// Promise method, get,then,catch,finally.
+
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 

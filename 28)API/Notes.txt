@@ -70,23 +70,6 @@ API TYPES ACCORDING TO USAGE PURPOSE
 
 
 
-AUTHENTICATION vs. AUTHORIZATION
-
-Authentication: Answers the question “Who are you?” It verifies the user’s identity.
-Example: Logging in with a username and password.
-
-Authorization: Answers the question “What are you allowed to do?” It checks the authenticated user’s permissions.
-Example: Only an admin can delete another user’s account.
-
-Authentication verifies identity; authorization verifies permissions.
-
-Login → Authentication → Authorization → Resource
-
-Real-life example: Using an ID card to enter a company building is authentication. 
-Being allowed to enter only specific rooms is authorization.
-
-
-
 
 ** The main advantage of POSTMAN, for the API client / HTTP request can be simulated without having any web based structure
 such front end design or express based backend
@@ -176,3 +159,126 @@ JSON to JS --> const jsObject = JSON.parse(JSONdata) --> Since incoming JSON act
                                                          we cannot use object built in functions
 
 ** Without comversion, json data cannot be managed inside the JS code 
+
+
+
+
+
+AUTHENTICATION vs. AUTHORIZATION
+
+For Course: https://www.udemy.com/course/the-complete-web-development-bootcamp/learn/lecture/38912024?start=0#overview
+
+Authentication: Answers the question “Who are you?” It verifies the user’s identity.
+Example: Logging in with a username and password.
+
+Authorization: Answers the question “What are you allowed to do?” It checks the authenticated user’s permissions.
+Example: Only an admin can delete another user’s account.
+
+Authentication verifies identity; authorization verifies permissions.
+
+Login → Authentication → Authorization → Resource
+
+Real-life example: Using an ID card to enter a company building is authentication. 
+Being allowed to enter only specific rooms is authorization.
+
+
+Does the request contain a valid token? → Authentication
+Does the user have the admin role?      → Authorization
+Can the user modify this specific item? → Authorization
+
+If authentication credentials are missing or invalid, the server generally returns:
+401 Unauthorized
+Despite its name, 401 Unauthorized normally represents an authentication problem.
+If the user is authenticated but does not have permission to perform the operation, the server generally returns:
+403 Forbidden
+
+
+
+
+0 Authentication --> for temporarly security corcerns, rate limitation can be adjusted.
+
+1 Basic Authentication --> username and password, usually use base64 encoding. For instance, one the username and password
+added via postman, encoded key can be found on the request header as base64 encoded "username:password" format.
+
+
+2 API-KEY Authorization --> can be added request header or query parameter as endpoint
+
+API keys are generally used to:
+Identify an application or project
+Authenticate server-to-server communication
+Track API usage
+Apply rate limits and quotas
+Restrict access to specific APIs
+API keys are often long-lived. If an API key is stolen, an attacker may continue using it until it is revoked or replaced.
+API keys should not be:
+Hard-coded in frontend JavaScript
+Embedded in publicly distributed applications
+Committed to Git repositories
+Included directly in URLs
+Written to application logs
+Environment variables or secret-management systems should be used to store them.
+
+
+3 TOKEN based Authorization --> A token is usually generated after a user or application successfully authenticates.
+                                Once user authenticated successfully, we do not need to use username or password anymore.
+                                just generated token.
+                                EXAMPLE : oauth or oauth2 based authentication
+
+                                username,password --> Token <--> API
+
+
+REAL LIFE EXAMPLE : Assume a 3th party app using google calender info so while accessing to 3th party app, we are using
+                    "sign in with GOOGLE" option so user can use Google authentication token within app. by that,
+                    User does not need to use personal info with 3th party app, instead, google just provide the only necessary
+                    user info with 3th party app. 
+                    PROXY : A proxy is an intermediary server positioned between a client and a destination server.
+                    Client → Proxy → Target Server
+                    Browser → Proxy Server → example.com
+
+
+The user logs in
+        ↓
+The server verifies the credentials
+        ↓
+The server generates an access token
+        ↓
+The client sends the token with later requests
+
+Tokens are commonly sent using the Authorization header:
+GET /api/profile HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+
+Bearer means that whoever possesses the token may be able to use it. Therefore, bearer tokens must be protected carefully.
+
+Token-based systems commonly use:
+A short-lived access token
+A longer-lived refresh token
+Roles and permission scopes
+Token expiration
+Token rotation and revocation mechanisms
+
+
+** For basic authentication methods, to increase the security level, the other option is using
+    HTTPS instead of HTTP
+
+HTTP + TLS = HTTPS
+When an API key or token is sent over HTTPS, TLS provides three important protections:
+Confidentiality: Third parties on the network cannot easily read the request or its credentials.
+Integrity: Attackers cannot easily modify requests or responses during transmission.
+Server authentication: The TLS certificate helps the client verify that it is communicating with the correct server.
+
+HTTPS
+└── Protects the communication channel
+    └── HTTP request
+        ├── API key or token → Helps identify the requester
+        └── Roles or scopes  → Determine allowed operations
+
+API key or token: Who is making the request?
+Authorization rules: What is the requester allowed to do?
+HTTPS: How are the credentials and data transported securely?
+
+
+In a production environment, an API that uses API keys or tokens should always use HTTPS. 
+Credentials should be sent through headers, kept out of URLs and logs, 
+rotated when appropriate, and limited to the minimum permissions required.
