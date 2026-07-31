@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Lisper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Titan+One&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="styles/main.css">
+
+</head>
+
+<body>
+  <h1>What's your secret? Hover your mouse over the image</h1>
+
+  <%if (locals.Secret) {%>
+
+    <%if (Secret.error) {%>
+      <div class="error"><%= Secret.error %> </div>
+      
+    <%} else {%>
+      <div class="card-wrap">
+        <div class="card">
+          <p> <%= Secret.secret %> </p>
+        </div>
+      </div>
+      <p class="user"> Nickname: <%= Secret.username %> </p>
+    <%}%>
+      
+  <%} else {%>
+    <h2>The user information could not be loaded automatically. Please try again.</h2>
+  <%}%>
+
+
+
+  <form action="/" method="GET">
+    <button class="reveal-button" type="submit" aria-label="Reveal another secret">
+      <svg class="reveal-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 11a8.1 8.1 0 0 0-15.5-3M4 4v4h4M4 13a8.1 8.1 0 0 0 15.5 3M20 20v-4h-4" />
+      </svg>
+      <span>Reveal another secret</span>
+    </button>
+  </form>
+
+  <% if (locals.remaining !== undefined) { %>
+    <p class="remain">
+      <span class="remain__dot" aria-hidden="true"></span>
+      Remaining requests:
+      <strong><%= remaining %></strong>
+    </p>
+  <% } %>
+  
+</body>
+
+</html>
