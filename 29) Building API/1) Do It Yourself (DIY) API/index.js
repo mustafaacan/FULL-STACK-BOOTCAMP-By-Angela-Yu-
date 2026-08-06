@@ -11,36 +11,88 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // To simulate the deletion ops.
 let temporaryDeletedItems = new Array();
-let dataVerify = {
-  isListAvailable: true,
-  message: "",
-};
+let allItemDeleted = false;
 
 //0. create a middleware to check jokes array is available and at least one element
 const verifyJokeList = (req, res, next) => {
   try {
-    if (jokes !== undefined) {
-      if (Array.isArray(jokes)) {
-        if (jokes.length > 1) {
-          dataVerify.isListAvailable = true;
-          dataVerify.message = "";
-        } else {
-          dataVerify.isListAvailable = false;
-          dataVerify.message = "Jokes Length should be more than 1";
-        }
-      } else {
-        dataVerify.isListAvailable = false;
-        dataVerify.message =
-          "Joke does not an Array type, it's type " + typeof jokes;
-      }
-    } else {
-      dataVerify.isListAvailable = false;
-      dataVerify.message = "Joke is not defined";
+    if (typeof jokes === "undefined") {
+      return res.status(500).json({ message: "Joke is not defined" });
     }
+
+    if (!Array.isArray(jokes)) {
+      return res.status(500).json({
+        message: "Joke does not an Array type, it's type " + typeof jokes,
+      });
+    }
+
+    if (jokes.length === 0) {
+      return res.status(500).json({ message: "Joke Array is empty" });
+    }
+
+    return next();
   } catch (error) {
-    dataVerify.isListAvailable = false;
-    dataVerify.message = error.message;
+    return res.status(500).json({ message: error.message });
   }
+};
+
+const verifyJokeId = (req, res, next) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      message: "Joke id should be a positive integer.",
+    });
+  }
+
+  if (temporaryDeletedItems.includes(id) || allItemDeleted) {
+    return res.status(404).json({
+      message: "Joke has been temporarily deleted.",
+    });
+  }
+
+  const joke = jokes.find((item) => item.id === id);
+
+  if (!joke) {
+    return res.status(404).json({
+      message: "Joke not found.",
+    });
+  }
+
+  req.joke = joke; // Found object will be available in GET request
+  // alternatively, we can use res.locals.joke to obtain found object with other middlewares or EJS
+  next();
+};
+
+const verifyJokeQuery = (req, res, next) => {};
+
+const verifyPostData = (req, res, next) => {
+  if (
+    !Object.keys(req.body).includes("text") ||
+    !Object.keys(req.body).includes("type")
+  ) {
+    return res.status(400).json({
+      message:
+        'Request body should include "text" and "type". Careful about case sensivity ',
+    });
+  }
+  if (req.body["type"].trim() === "") {
+    return res.status(400).json({
+      message: "type should be provided.",
+    });
+  }
+  if (req.body["text"].trim() === "") {
+    return res.status(400).json({
+      message: "text should be provided.",
+    });
+  }
+
+  req.updatedBody = {
+    id: jokes[jokes.length - 1].id + 1,
+    jokeText: req.body["text"].trim(),
+    jokeType: req.body["type"].trim(),
+  };
+
   next();
 };
 
@@ -49,36 +101,54 @@ app.use(verifyJokeList);
 //1. GET a random joke
 // CAUTION: We can manage multiple URLs with using array
 app.get(["/", "/random"], (req, res) => {
-  if (dataVerify.isListAvailable) {
-    // Checking if there is any not deleted item by comparing with temporaryDeletedItems array
-    const deletedIds = new Set(temporaryDeletedItems); // to remove duplicated items.
-    const availableJokes = jokes.filter((joke) => !deletedIds.has(joke.id));
-    if (availableJokes.length === 0) {
-      return res.status(404).json({
-        message: "All jokes have been temporarily deleted.",
-      });
-    }
-    const randomIndex = Math.floor(Math.random() * availableJokes.length);
-    const randomJoke = availableJokes[randomIndex];
-    return res.status(200).json({
-      id: randomJoke.id,
-      jokeType: randomJoke.jokeType,
-      jokeText: randomJoke.jokeText,
+  // Checking if there is any not deleted item by comparing with temporaryDeletedItems array
+  const deletedIds = new Set(temporaryDeletedItems); // to remove duplicated items.
+  const availableJokes = jokes.filter((joke) => !deletedIds.has(joke.id));
+  if (availableJokes.length === 0) {
+    return res.status(404).json({
+      message: "All jokes have been temporarily deleted.",
     });
-  } else {
-    return res.status(404).json({ message: dataVerify.message });
   }
+
+  if (allItemDeleted) {
+    return res.status(404).json({
+      message: "All jokes have been temporarily deleted.",
+    });
+  }
+  const randomIndex = Math.floor(Math.random() * availableJokes.length);
+  const randomJoke = availableJokes[randomIndex];
+  return res.status(200).json({
+    id: randomJoke.id,
+    jokeType: randomJoke.jokeType,
+    jokeText: randomJoke.jokeText,
+  });
 });
 
-//2. GET a specific joke
+//2. GET a specific joke usign verifyJokeId middleware specifically
 // path should be entered.
-// parameter type should be integer şeklinde parse edilebilmeli
-// id kısmı silinenler listesinde olmamalı
-// verilen id ile arama yapıldığında sonuç boş dönerse ona uygun bir çıktı verilmeli
+// parameter type should be integer
+// ID wiil be check form deleted items
+// Gıven ID should be included inside
+app.get("/jokes/:id", verifyJokeId, (req, res) => {
+  res.status(200).json({ message: req.joke });
+});
 
 //3. GET a jokes by filtering on the joke type
+// empty type, absence of type and case-sensetivity will be accepted as error
+// return will be an array
+// Do not forget the remove deleted items
+app.get("/filter", verifyJokeQuery, (req, res) => {});
 
 //4. POST a new joke
+// type and text cannot be empty
+// type and text should be trimmed
+// ID should be assigned automatically. find the latest object's ID and add 1
+app.post("/jokes", verifyPostData, (req, res) => {
+  jokes.push(req.updatedBody);
+  return res.status(200).json({
+    message: "Jokes list has been updated.",
+  });
+});
 
 //5. PUT a joke
 
@@ -87,9 +157,25 @@ app.get(["/", "/random"], (req, res) => {
 //7. DELETE Specific joke
 // 1) check the id is integer or not --> Bad Request
 // 2) check the item already deleted or not --> not changed anything code ?? to prevent duplicated cases
-// 3) after deletion, add the item id to temporary list
+// 3) check the item can be found or not
+// 4) after deletion, add the item id to temporary list
+app.delete("/jokes/:id", verifyJokeId, (req, res) => {
+  temporaryDeletedItems.push(Number(req.params.id));
+  console.log(req.params.id);
+  console.log(temporaryDeletedItems);
+  return res.status(200).json({
+    message: "ID has been temporarily deleted.",
+  });
+});
 
 //8. DELETE All jokes
+// allItemDeleted variable will be true
+app.delete("/all", (req, res) => {
+  allItemDeleted = true;
+  return res.status(200).json({
+    message: "All jokes have been temporarily deleted.",
+  });
+});
 
 // FOR THE ALL OTHER REQUESTED URL THAT NOT EXIST
 app.use((req, res) => {
@@ -103,7 +189,7 @@ app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
 });
 
-const jokes = [
+let jokes = [
   {
     id: 1,
     jokeText:
