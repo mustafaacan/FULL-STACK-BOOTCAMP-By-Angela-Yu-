@@ -64,6 +64,23 @@ const verifyJokeId = (req, res, next) => {
   next();
 };
 
+const verifyMasterKey = (req, res, next) => {
+  const providedKey = req.get("x-master-key")
+    ? req.get("x-master-key").trim()
+    : undefined;
+  if (providedKey === undefined) {
+    return res.status(401).json({
+      message: "MasterKey required for the operation.",
+    });
+  }
+  if (providedKey === "" || providedKey !== masterKey) {
+    return res.status(403).json({
+      message: "Invalid MasterKey.",
+    });
+  }
+  next();
+};
+
 const verifyJokeBody = (req, res, next) => {
   const { text, type } = req.body;
   const isPartialUpdate = req.method === "PATCH";
@@ -221,7 +238,8 @@ app.patch("/jokes/:id", verifyJokeId, verifyJokeBody, (req, res) => {
 });
 
 //7. DELETE Specific joke
-app.delete("/jokes/:id", verifyJokeId, (req, res) => {
+// Valid masterKey should be provided inside request header as x-master-key
+app.delete("/jokes/:id", verifyMasterKey, verifyJokeId, (req, res) => {
   // 1) check the id is integer or not --> Bad Request
   // 2) check the item already deleted or not --> not changed anything code ?? to prevent duplicated cases
   // 3) check the item can be found or not
@@ -246,7 +264,8 @@ app.delete("/jokes/:id", verifyJokeId, (req, res) => {
 
 //8. DELETE All jokes
 // allItemDeleted variable will be true
-app.delete("/all", (req, res) => {
+// Valid masterKey should be provided inside request header as x-master-key
+app.delete("/all", verifyMasterKey, (req, res) => {
   allItemDeleted = true;
   // let temp deleted item array empty and all the ID's should be added inside it.
   temporaryDeletedItems.length = 0;
