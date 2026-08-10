@@ -38,6 +38,8 @@ let lastId = 3;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Özellikle sorgulaman gerek neden 2 farklı server çalıştırıyoruz ?
+
 //Write your code here//
 
 //CHALLENGE 1: GET All posts
