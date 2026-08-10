@@ -1,0 +1,40 @@
+WHY DO WE NEED AUTHENTICATION?
+
+Authentication is necessary to verify that a user is really who they claim to be.
+
+For example, when a user says, "I am Mustafa," the system verifies their identity using a password, verification code,
+biometric data, or passkey.
+
+Authentication helps us:
+
+- Prevent unauthorized access to accounts.
+- Protect personal data.
+- Display user-specific content.
+- Identify who performed an action.
+- Associate shopping carts, orders, messages, and settings with the correct user.
+
+In short:
+
+- Authentication asks: "Who are you?"
+- Authorization asks: "What are you allowed to do?"
+
+For example, logging in is authentication. Allowing only administrators to access the admin panel is authorization.
+
+There are different techniques and best practices for implementing secure authentication:
+1.Username/email and password authentication  
+2.Password hashing and salting  
+3.Stronger hashing techniques  
+4.Cookies and sessions  
+5.Environment variables for protecting secrets  
+6.OAuth for third-party authentication
+
+
+IMPORTANT CLARIFICATIONS
+
+- Passwords should never be stored directly in plain text.
+- Passwords are generally protected using hashing and salting rather than encryption.
+- Cookies and sessions are used to manage a user's logged-in state.
+- Environment variables are not an authentication method. They are used to protect sensitive values such as API keys 
+and session secrets.
+- OAuth is not necessarily the "highest level of security." It is a protocol that allows delegated access and authentication 
+through a third-party provider.
