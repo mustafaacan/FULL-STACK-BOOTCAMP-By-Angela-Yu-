@@ -1,0 +1,13 @@
+For SQL Practice
+https://www.w3schools.com/sql/
+
+Other useful Links
+
+https://www.w3schools.com/sql/sql_datatypes.asp
+
+https://www.w3schools.com/sql/sql_primarykey.asp
+
+https://sqliteonline.com/ --> PlayGround
+
+
+CRUD --> Create Read Update Delete
