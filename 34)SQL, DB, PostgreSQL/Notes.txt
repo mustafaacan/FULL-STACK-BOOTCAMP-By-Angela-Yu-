@@ -11,3 +11,19 @@ https://sqliteonline.com/ --> PlayGround
 
 
 CRUD --> Create Read Update Delete
+
+
+POSTGRE SQL
+
+2 main member should be used 
+
+1. Postgre server --> DB for application
+
+2. Pg Admin --> DB interface. otherwise, we have to use CLI terminal for ops
+
+
+POSTGRE DATATYPES
+
+https://www.postgresql.org/docs/current/datatype.html
+
+
