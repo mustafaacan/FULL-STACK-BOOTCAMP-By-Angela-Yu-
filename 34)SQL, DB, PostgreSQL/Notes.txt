@@ -27,3 +27,24 @@ POSTGRE DATATYPES
 https://www.postgresql.org/docs/current/datatype.html
 
 
+
+
+
+CREATE EXAMPLE
+
+CREATE TABLE capitals (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- Auto increasement provided
+    country VARCHAR(50) not null,
+	capital VARCHAR(50) not null
+);
+
+** Primary = Unique + not null (we do not use these keywords)
+** GENERATED ALWAYS AS IDENTITY --> acts like auto increasement, we do not need to add ID values while data inserting
+
+
+NOTE
+If a multiple data should be inserted into table, for shortly, we can use import option. Assume you have CSV file
+
+1. right click to the target table and select import/export ops
+2. select the file from your device.
+3. from options select header.
