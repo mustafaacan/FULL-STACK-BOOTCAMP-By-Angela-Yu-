@@ -48,3 +48,11 @@ If a multiple data should be inserted into table, for shortly, we can use import
 1. right click to the target table and select import/export ops
 2. select the file from your device.
 3. from options select header.
+
+
+INSERT EXAMPLE
+
+INSERT INTO <Tablename> (<column names>)
+VALUES (.....)
+
+NOTE : column names can be any order but values also should be given according to column name's order.
