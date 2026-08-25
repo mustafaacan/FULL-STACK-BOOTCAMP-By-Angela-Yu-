@@ -56,3 +56,95 @@ INSERT INTO <Tablename> (<column names>)
 VALUES (.....)
 
 NOTE : column names can be any order but values also should be given according to column name's order.
+
+
+
+ONE-TO-MANY AND MANY-TO-ONE RELATIONSHIPS
+
+One-to-Many:
+One record can be related to many records.
+
+Example: One teacher can have many students.
+One teacher -> Many students
+
+Many-to-One:
+Many records can be related to one record. It is the reverse view of a one-to-many relationship.
+
+Example: Many students can have the same teacher.
+Many students -> One teacher
+
+Another example:
+One department has many employees.
+Many employees belong to one department.
+
+The foreign key is usually stored on the "many" side:
+
+Employee
+- id
+- name
+- department_id  <-- Foreign key
+
+
+MANY-TO-MANY RELATIONSHIP
+
+A many-to-many relationship means that many records in one table can be related to many records in another table.
+
+*** Caution : there should be an extra table (junction table) between 2 tables.
+*** Caution : The primary key of the junction table should be a combination of the 2 PK
+from 2 tables.
+
+Example:
+One student can take many courses, and one course can have many students.
+
+Students >---< Courses
+
+A junction table is required to connect the two tables:
+
+CREATE TABLE students (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    student_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE courses (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    course_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE student_courses (
+    student_id INTEGER REFERENCES students(id),
+    course_id INTEGER REFERENCES courses(id),
+    PRIMARY KEY (student_id, course_id)
+);
+
+The student_courses table is called a junction table.
+Its two foreign keys connect students and courses.
+The composite primary key prevents the same student-course relationship from being added twice.
+
+Example data:
+
+INSERT INTO students (student_name)
+VALUES ('Mustafa'), ('John');
+
+INSERT INTO courses (course_name)
+VALUES ('PostgreSQL'), ('JavaScript');
+
+INSERT INTO student_courses (student_id, course_id)
+VALUES
+    (1, 1),
+    (1, 2),
+    (2, 1);
+
+In this example, Mustafa takes two courses, and the PostgreSQL course has two students.
+
+
+CREATE TABLE departments (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE employees (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    employee_name VARCHAR(100) NOT NULL,
+    department_id INTEGER NOT NULL REFERENCES departments(id),
+);
+
