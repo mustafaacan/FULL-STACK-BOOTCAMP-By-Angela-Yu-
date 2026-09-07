@@ -65,6 +65,15 @@ body {
   }
 }
 
+.delete {
+  background-color:#ee382b !important;
+  margin-left: 10px;
+}
+
+.delete:hover{
+  background-color:#b71b10 !important;
+}
+
 input {
   font-family: "Roboto", sans-serif;
   outline: 0;

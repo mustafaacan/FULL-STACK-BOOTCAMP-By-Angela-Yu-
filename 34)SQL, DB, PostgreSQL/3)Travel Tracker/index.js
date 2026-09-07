@@ -137,7 +137,6 @@ app.post("/add", async (req, res) => {
       error =
         "Input already added or not match with expected entry. Entry should be 2 chars of the target country code";
     }
-    console.log(countries.join(","));
 
     return res.redirect("/");
   }

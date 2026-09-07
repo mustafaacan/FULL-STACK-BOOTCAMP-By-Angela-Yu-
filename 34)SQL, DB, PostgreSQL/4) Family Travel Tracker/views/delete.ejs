@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delete User</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+    <link rel="stylesheet" href="./styles/new.css" />
+  </head>
+
+  <body>
+    <h1>Delete Family Member</h1>
+
+    <form action="/delete" method="post">
+      <p>Are you sure you want to delete <%= user.name %>?</p>
+      <input type="hidden" name="userId" value="<%= user.id %>" />
+
+      <div class="spacer"></div>
+      <button type="submit" class="delete" name="delete" value="delete">
+        Delete
+      </button>
+      <button type="submit" class="delete" name="delete" value="cancel">
+        Cancel
+      </button>
+    </form>
+  </body>
+</html>

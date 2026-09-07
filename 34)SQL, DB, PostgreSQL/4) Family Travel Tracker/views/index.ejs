@@ -12,19 +12,24 @@
   <form class="tab-view tab-view-height-auto" action="/user" method="post">
     <% users.forEach(function(user) { %>
       <input type="submit" name="user" value="<%= user.id %>" id="<%= user.id %>">
-      <label for="<%= user.id %>" style="background-color: <%= user.color %>;">
+      <label for="<%= user.id %>" style="background-color: <%= user.color %>">
         <%= user.name %>
       </label>
       <% }); %>
 
-        <input type="submit" name="add" value="new" id="tab">
-        <label for="tab">Add Family Member</label>
+        <input type="hidden" name="currentUser" value="<%= currentUserId %>" >
+        <input type="submit" name="add" value="new" id="tab1">
+        <label for="tab1">Add Family Member (Remaining <%= maxUser %>)</label>
+
+        <input type="submit" name="delete" value="delete" id="tab2">
+        <label class ="delete" for="tab2">Delete User</label>
 
   </form>
 
   <form action="/add" method="post">
-    <input type="text" name="country" autofocus placeholder="<%= locals.error ? error :  'Enter country name'%>">
-    <button type="submit" style="background-color: <%= color %>;">Add</button>
+    <input type="hidden" name="user" value="<%= currentUserId %>">
+    <input type="text" name="country" autofocus placeholder="<%= locals.error ? error :  'Enter Country Code (RU, US, GR etc.)'%>">
+    <button type="submit" style="background-color: teal;">Add</button>
   </form>
 
   <section class="ag-canvas">
@@ -388,11 +393,29 @@
   <h2 class="total-count">Total Countries: <%=total%>
   </h2>
   <script>
-    const country_codes = "<%= countries %>".split(",")
-    console.log(typeof ("<%= countries %>"))
-    country_codes.forEach(code => {
-      document.getElementById(code).style.fill = "<%= color %>"
+    const countryCodes = <%- JSON.stringify(countries) %>;
+
+    countryCodes.forEach((code) => {
+      const countryElement = document.getElementById(code);
+
+      if (countryElement) {
+        countryElement.style.fill = "<%= color %>";
+      }
     });
+
+    // Remove the temporary message from the URL without reloading the page.
+    // Other parameters, such as the selected user ID, remain in the URL.
+    const currentUrl = new URL(window.location.href);
+
+    if (currentUrl.searchParams.has("message")) {
+      currentUrl.searchParams.delete("message");
+
+      window.history.replaceState(
+        {},
+        document.title,
+        `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`,
+      );
+    }
   </script>
 </body>
 
