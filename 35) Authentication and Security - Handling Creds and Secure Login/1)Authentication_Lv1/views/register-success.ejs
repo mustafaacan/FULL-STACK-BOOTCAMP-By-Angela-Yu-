@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+
+<div class="container mt-5">
+<% if(typeof username !== "undefined" && username) {%>
+  <div class="alert alert-success">User <%=username%> created successfully.</div>
+<% } else {%>
+    <div class="alert alert-success">User created successfully.</div>
+<% }%>
+  <a href="/" class="btn btn-dark">Go to Home</a>
+</div>
+
+<%- include('partials/footer') %>

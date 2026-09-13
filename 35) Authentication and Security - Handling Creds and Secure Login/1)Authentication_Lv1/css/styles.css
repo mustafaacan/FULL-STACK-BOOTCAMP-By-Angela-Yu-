@@ -14,3 +14,7 @@ body {
   color: #fff;
   background-color: #000;
 }
+
+.alert{
+  margin-top: 10px;
+}

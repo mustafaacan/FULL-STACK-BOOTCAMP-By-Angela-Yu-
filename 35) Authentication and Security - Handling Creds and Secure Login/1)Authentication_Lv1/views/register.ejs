@@ -19,7 +19,12 @@
               </div>
               <button type="submit" class="btn btn-dark">Register</button>
             </form>
-
+          
+            <% if (typeof error !== "undefined" && error) { %>
+            <div class="alert alert-danger">
+              <%= error %>
+            </div>
+            <% } %>
           </div>
         </div>
       </div>
@@ -38,4 +43,4 @@
     </div>
   </div>
 
-  <%- include('partials/header') %>
+  <%- include('partials/footer') %>
