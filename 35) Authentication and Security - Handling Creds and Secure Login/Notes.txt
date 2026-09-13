@@ -38,3 +38,15 @@ IMPORTANT CLARIFICATIONS
 and session secrets.
 - OAuth is not necessarily the "highest level of security." It is a protocol that allows delegated access and authentication 
 through a third-party provider.
+
+
+FOR HACKING PASSWORD EXAMPLES, YOU MAY VISIT THE WEBSITE
+https://plaintextoffenders.tumblr.com/
+
+
+TO SEE IF YOUR ACCOUNT INCLUDED INSIDE THE BREACHED WEBSITES OR NOT
+https://haveibeenpwned.com/
+
+
+PASSWORD STRENGTH & MORE
+http://password-checker.online-domain-tools.com/
