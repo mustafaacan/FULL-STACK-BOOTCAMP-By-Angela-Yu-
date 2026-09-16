@@ -50,3 +50,26 @@ https://haveibeenpwned.com/
 
 PASSWORD STRENGTH & MORE
 http://password-checker.online-domain-tools.com/
+
+
+
+SALTING
+
+SALTING: To prevent dictionary and hash table attacks. Adds random data every time before record to
+DB to increase securty level. Since salting addition change everytime, the same password generates
+different hashings each time.
+
+Instead of using MD5 hashes, Bcrypt method will be useful because modern GPUs can resolve 
+20.000.000.000 MD5 hashes / second but 17.000 Bcrypt hashes / second 
+
+ORIGINAL PASSWORD + SALTING --> (Bcrypt hashing) --> DB Record
+
+Its also passible to increase the level of hashing for instance
+
+ORIGINAL PASSWORD + SALTING --> (Bcrypt hashing) + SALTING --> (Bcrypt hashing)
+
+CAUTION : Since hashed password will be change everytime, we cannot
+compare the entered original password with the recorded one so functions
+include their own compare methods for it such
+
+bcrypt.compare()
