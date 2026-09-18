@@ -73,3 +73,127 @@ compare the entered original password with the recorded one so functions
 include their own compare methods for it such
 
 bcrypt.compare()
+
+
+
+
+COOKIES
+
+Cookie behavior:
+Cookies are automatically sent by the browser with requests that match the cookie’s domain, path, and security rules.
+
+localStorage behavior:
+Data in localStorage is not sent automatically with HTTP requests. JavaScript must read it and explicitly add it to the request when needed.
+
+** localStorage more persistent than cookie. without romeve or clear the cache, we can read it from storage. However, cookies are session based structures
+and acting more secure also similar to middlewares. when we request a domain, all the related cookies can be obtained by browser 
+
+When to use localStorage vs Cookies
+
+localStorage: Best for non-sensitive, client-side data such as theme, language, UI preferences, or selected tabs.
+Cookies: Better for authentication and session data, especially when using HttpOnly, Secure, and SameSite.
+
+Key difference:
+
+localStorage → Accessible by JavaScript → Good for client-side state (theme, language, lastSelectedTab)
+
+HttpOnly Cookie → Not accessible by JavaScript → Better for authentication/session tokens
+
+Short rule:
+Use localStorage for non-sensitive frontend data and secure HttpOnly cookies for authentication data.
+
+USAGE
+
+localStorage → Managed by JavaScript → Token is typically read by JavaScript and manually added to the Authorization header.
+
+Cookie → Managed by the browser → Cookie can be automatically attached to matching HTTP requests.
+
+In short: localStorage usually requires explicit JavaScript handling, while cookies can be sent automatically by the browser.
+
+localStorage → Origin-specific
+Same origin → Accessible (http://website:3000/)
+Different domain/protocol/port → Not accessible (http://website:10000/)
+
+** cookies can be managed in the terms of domains
+Set-Cookie: sessionId=abc123; Domain=example.com; Path=/; Secure; HttpOnly (JS cannot access to info so become more secure)
+
+
+How long a cookie is stored depends on the settings defined when the cookie is created.
+
+There are two main types:
+
+**Session Cookie**
+
+* If `Expires` or `Max-Age` is not specified, the cookie is generally treated as a session cookie.
+* It is usually removed when the browser session ends.
+* However, some browsers may restore session cookies when session restore is enabled.
+
+**Persistent Cookie**
+
+* If `Expires` or `Max-Age` is specified, the cookie can remain stored until the defined expiration time.
+
+Examples:
+
+```http
+Set-Cookie: sessionId=abc123; Max-Age=3600
+```
+
+This cookie is stored for approximately **1 hour**.
+
+```http
+Set-Cookie: sessionId=abc123; Expires=Fri, 18 Sep 2026 12:00:00 GMT
+```
+
+This cookie remains stored until the specified expiration date.
+
+**Quick summary:**
+
+```text
+No expiration      → Session cookie
+Max-Age=3600       → 1 hour
+Max-Age=86400      → 1 day
+Max-Age=2592000    → 30 days
+```
+
+**Important:** The cookie's storage duration and the token's validity period are different concepts. For example, a cookie may be stored for 30 days, 
+but if the access token inside it expires after 1 hour, it will no longer be valid for authentication after that hour.
+
+
+**localStorage** does not have a built-in expiration time.
+
+Data stored in `localStorage` usually remains there until:
+
+* JavaScript explicitly removes it
+* The user clears the browser/site data
+* The browser removes site data under storage-management conditions
+
+Example:
+
+```javascript
+localStorage.setItem("accessToken", "abc123");
+```
+
+The value remains stored even after the browser is closed and reopened.
+
+It can be removed manually:
+
+```javascript
+localStorage.removeItem("accessToken");
+```
+
+or all localStorage data for that origin can be cleared:
+
+```javascript
+localStorage.clear();
+```
+
+**Quick comparison:**
+
+```text
+Cookie       → Can have a defined expiration time
+localStorage → No built-in expiration; persists until removed
+```
+
+**Important:** Just like with cookies, the lifetime of the stored value and the validity of an access token are separate concepts. A token may remain in `localStorage` for months,
+but if the token itself expires after 1 hour, it can no longer be used for authentication.
+
