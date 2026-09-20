@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Generated project files
+URL.txt
+qr_img.png
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store

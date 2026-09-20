@@ -52,6 +52,12 @@ PASSWORD STRENGTH & MORE
 http://password-checker.online-domain-tools.com/
 
 
+*** PASSWORD MIDDLEWARE LIBRARY 
+https://www.passportjs.org/docs/
+
+For local password example (follow the order) --> https://www.passportjs.org/tutorials/password/
+
+
 
 SALTING
 
@@ -80,7 +86,8 @@ bcrypt.compare()
 COOKIES
 
 Cookie behavior:
-Cookies are automatically sent by the browser with requests that match the cookie’s domain, path, and security rules.
+Cookies are automatically sent by the browser with requests that match the cookie’s domain, path, and security rules. Usually sent from Server to Browser after
+incoming post request (user action) from browser to server
 
 localStorage behavior:
 Data in localStorage is not sent automatically with HTTP requests. JavaScript must read it and explicitly add it to the request when needed.
@@ -197,3 +204,74 @@ localStorage → No built-in expiration; persists until removed
 **Important:** Just like with cookies, the lifetime of the stored value and the validity of an access token are separate concepts. A token may remain in `localStorage` for months,
 but if the token itself expires after 1 hour, it can no longer be used for authentication.
 
+
+
+A SHORT AUTHENTICATION REQUIRED ROUTES EXAMPLES
+
+/// MIDDLEWARE
+
+function requireLogin(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next(); // İstenen route'a devam et
+  }
+
+  return res.redirect("/login");
+}
+
+// PASSWORD MIDDLEWARES
+app.use(passport.initialize());
+app.use(passport.session());
+
+// LOGIN NOT REQUIRED
+app.get("/", (req, res) => res.render("home.ejs"));
+app.get("/login", /* ... */);
+app.post("/login", /* ... */);
+app.get("/register", /* ... */);
+app.post("/register", /* ... */);
+
+// LOGIN REQUIRED ROUTES AFTER MIDDLEWARE CALL
+app.use(requireLogin);
+
+app.get("/secrets", (req, res) => res.render("secrets.ejs"));
+app.get("/profile", (req, res) => res.render("profile.ejs"));
+app.get("/settings", (req, res) => res.render("settings.ejs"));
+
+
+
+WHAT IS THE DEFFERANCE BETWEEN password.session & express-session
+
+app.use(session({ ... })) — manages the session
+This comes from express-session. It reads the session ID from the browser’s cookie, loads the corresponding server-side session, and makes it available through req.session.
+A session can store login information, shopping cart data, or other information.
+
+app.use(passport.session()) — restores the logged-in user
+This comes from Passport. If the session contains Passport login information, it calls deserializeUser() and places the resulting user in req.user.
+Your routes can then use req.isAuthenticated() to check whether the request belongs to a logged-in user.
+For each request, the flow looks like this:
+
+Browser sends the session cookie
+              ↓
+express-session loads the session → req.session
+              ↓
+passport.session() restores the user → req.user
+              ↓
+Your route checks req.isAuthenticated()
+
+That is why the order matters:
+
+app.use(session({ /* session options */ }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+express-session manages the session; passport.session() identifies the logged-in user through that session.
+
+
+
+
+
+ENVIRONMENT VARIBLES
+
+Two main advantages of the variables
+
+1. centralized control without changing code parts. Global variable can be red from Env variables.
+2. security. Some API Keys, Secret keys etc. can be stored inside the Env variable
