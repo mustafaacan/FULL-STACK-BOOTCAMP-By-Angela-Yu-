@@ -275,3 +275,23 @@ Two main advantages of the variables
 
 1. centralized control without changing code parts. Global variable can be red from Env variables.
 2. security. Some API Keys, Secret keys etc. can be stored inside the Env variable
+
+
+
+
+THIRD PARTY OAUTH (Sign in with google, facebook etc.)
+
+The some of the advantages as below
+
+1. Provide more security
+2. Can request user info from other app so register step can be skipped.
+3. Some recommendation mechanism can be used. For instance, if user use facebook for login to new social media
+   new aap can request from facebook about user friend and add them automatically to followed users list
+4. For developers, reduces the improvement ranges.
+5. Duality can be provided between apps. For instance, some apps request the user info just read only mod.
+   Some of them also add new things about user and the updates can be posted through the other app also.
+
+To authenticate the any third party app for our app, firstly, we need to introduce our app to the third party app.
+Then the third party app usually will provide us some special keys such client ID or Client key. For more info,
+you may follow the instruction below,
+// https://www.udemy.com/course/the-complete-web-development-bootcamp/learn/lecture/41780550#overview
