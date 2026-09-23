@@ -8,6 +8,9 @@ import session from "express-session";
 import env from "dotenv";
 import GoogleStrategy from "passport-google-oauth2";
 
+// REGISTER ISLEMINI DE STRATEGY MIDDLEWARE ICINE EKLEYEMEZ MIYIZ ?
+// GENEL BIR CEKI DUZEN
+
 // BEFORE OPS BE SURE THE ADJUSTMENT DONE ON YOUR BROWSER
 // https://www.udemy.com/course/the-complete-web-development-bootcamp/learn/lecture/41780550#overview
 
@@ -73,9 +76,21 @@ app.post(
   passport.authenticate("local", {
     successRedirect: "/secrets",
     failureRedirect: "/login",
-    failureMessage: true,
+    failureMessage: true, // THIS IS MUST TO SEE SESSION MESSAGES
   }),
 );
+
+// #################################### LOGOUT #######################################
+// WILL BE AVAILABLE FOR ALL PASSWORD STRATEGIES
+// POSSIBLE ERROR WILL BE REFLECTED BY THE ERROR MIDDLEWARE IN THE END OF THE SCRIPT
+app.get("/logout", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
+});
 
 // #################################### REGISTER #######################################
 app.get("/register", (req, res) => {
@@ -116,21 +131,10 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// #################################### LOGOUT #######################################
-// WILL BE AVAILABLE FOR ALL PASSWORD STRATEGIES
-// POSSIBLE ERROR WILL BE REFLECTED BY THE ERROR MIDDLEWARE IN THE END OF THE SCRIPT
-app.get("/logout", (req, res, next) => {
-  req.logout(function (err) {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/");
-  });
-});
-
 // #################################### SECRETS #######################################
 app.get("/secrets", (req, res) => {
   console.log(req.user);
+  // For general password ops
   if (req.isAuthenticated()) {
     res.render("secrets.ejs");
   } else {
@@ -168,6 +172,7 @@ app.get(
 // Default name is local. we can change the name with defining in the beginning of the code
 // see the google strategy definition
 passport.use(
+  "local",
   new Strategy(async function verify(username, password, cb) {
     try {
       const result = await db.query("SELECT * FROM users WHERE email = $1 ", [
