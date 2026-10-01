@@ -18,6 +18,9 @@ npm install <packageName> (for specific packages)
 
 ADDING .gitignore
 
+** On the incoming projects, you can find more detailed gitignore files, especially on the 
+35. Authentication section
+
 While creating the project manually, it wont be created automatically so please follow the steps,
 
 -- touch .gitignore (to Terminal and before select the correct path)
@@ -73,3 +76,70 @@ CommonJS equivalent:
 
 const { writeFile, readFile } = require("node:fs/promises");
 
+
+***********
+
+- PATH GENERATION
+
+We can use 2 methods for it.
+
+1. const filePath = new URL("./message.txt", import.meta.url);
+// import.meta.url --> The path that the current script located.
+// "./message.txt" --> The target URL
+// new URL GENERATES the object that include target path info
+
+we can also generate the URL path more dynamically
+const targetPathQR = new URL(`./QRCODES/${fileName}`, import.meta.url);
+
+2. import path from "node:path";
+const filePath = path.join("data", "users", "message.txt");
+
+// Output --> data/users/message.txt
+
+
+
+
+
+***********
+
+- JSON OPS
+
+*** the JSON object cannot be used inside the JS file directly such JS object. Because they are actually
+acts like STRING so before use we need to convert them into JS objects
+
+*** While recording the JS objects as JSON objects, we need to convert them as STRINGIFY objects.
+
+latestUrlObj = JSON.parse(data);
+// converts the json object to js object.
+
+const updatedObj = JSON.stringify({ ...latestUrlObj, ...obj }, null, 2);
+// JSON.stringify generates json file from js object
+// 1) If they have common keys, the value of the second object will be accepted.
+// 2) null --> there wont be any filter or special function while merging
+// 3) 2 --> indent value for more readible files
+
+
+
+***********
+
+- DYNAMIC OBJECT NAMING
+
+Normally we can define a key such below
+
+const obj = {fileName: "abc"};
+
+// Output --> { fileName: "https://google.com" }
+
+we can create more dynamic structure for key definition
+
+const fileName = "hero.png";
+const url = "https://google.com";
+
+const createdObj = {
+  [fileName]: url
+};
+
+// Output --> { "hero.png": "https://google.com" }
+
+fileName --> Direct key name
+[fileName] --> definition of fileName as key name

@@ -1,6 +1,15 @@
 import { writeFile, readFile } from "node:fs/promises";
 
+// import.meta.url --> The path that the current script located.
+// "./message.txt" --> The target URL
+// new URL GENERATES the object that include target path info
 const filePath = new URL("./message.txt", import.meta.url);
+console.log("THE TARGET PATH INFO");
+console.log(import.meta.url);
+console.log(filePath);
+
+// Normally both reading and writing ops will be worked simultaneously.
+// To prevent the order shift, we can use asynchronous structures.
 
 async function createFile(message) {
   console.log("New File Creation...");
@@ -24,5 +33,8 @@ async function readAFile() {
   }
 }
 
+// First ops.
 await createFile("Hello from Node.js\nMy name is Mustafa");
+
+// Second ops.
 await readAFile();
