@@ -1,5 +1,5 @@
 import express from "express";
-import { dirname } from "path";
+import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
 
@@ -19,9 +19,19 @@ function validateSubmit(req, res, next) {
   // BY the using UI, some security policies can be satisfied. But, when someone try to post any data from tools
   // such postman and swagger, there might be a security leak so while writing the code, all the possibilites
   // should be considered
-  if (req.body.pet && req.body.street) {
+  if (
+    Object.keys(req.body).includes("pet") &&
+    Object.keys(req.body).includes("street")
+  ) {
     const valueCheck = Object.values(req.body).filter((item) => {
-      return item.trim() != "" && item != null;
+      console.log(item);
+      return (
+        // Only numbers and chars
+        item.trim() !== "" &&
+        item === item.trim() && // to detect the value that includes any space 'sad' !== 'sad '
+        item !== null &&
+        /^[\p{L}\p{N} ]+$/u.test(item)
+      );
     });
     console.log(valueCheck);
     if (valueCheck.length === 2) {
@@ -30,10 +40,10 @@ function validateSubmit(req, res, next) {
         message: "Successful",
       });
     } else {
-      console.log("Body includes empty values");
-      res.message = "Body includes empty values";
+      console.log("Body includes empty or invalid values");
+      res.message = "Body includes empty or invalid values";
       return res.status(400).json({
-        message: "Body includes empty values",
+        message: "Body includes empty or invalid values",
       });
     }
   } else {
@@ -55,8 +65,10 @@ function validateSubmit(req, res, next) {
 // For bigger projects, backend usually sends data instead of HTML and client side (REACT ETC.) by using the data and components,
 // generates the necessary UI
 app.get("/", (req, res) => {
-  console.log("The path of the html index: ", __dirname);
-  res.sendFile(__dirname + "/public/index.html");
+  // comes from path.join()
+  const indexPath = join(__dirname, "public", "index.html");
+  console.log("The path of the html index: ", indexPath);
+  res.sendFile(indexPath);
 });
 
 app.post("/", validateSubmit, (req, res) => {
