@@ -236,7 +236,7 @@ Middleware is commonly used for:
 - Handling errors
 - Adding information to the req or res object
 
-If the middleware does not send a response, it must call next(). Otherwise, the
+*** If the middleware does not send a response, it must call next(). Otherwise, the
 request will not continue to the next middleware or route handler and may remain
 pending.
 
@@ -255,7 +255,8 @@ USAGE of bodyParser (external library) or express.urlencoded (internal) MIDDLEWA
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 
-By the one of them, incoming POST data from Postman / Swagger or Form structure can be addressed inside of "req.body"
+By the one of them, incoming POST data from Postman / Swagger or Form structure 
+can be addressed inside of "req.body" !!!
 
 For instane, when we send from Postman
 
@@ -265,6 +266,9 @@ street=green
 Express app can convert it to
 
 { pet: "cat", street: "green" }
+
+req.body.pet // "cat"
+req.body.street // "green"
 
 
 MORGAN LOGGER FOR EXPRESS
@@ -328,3 +332,78 @@ app.post(
   checkPasswordLength,
   loginHandler
 );
+
+
+ADDITIONAL INFORMATION
+
+
+*** LISTENING PORT AND RESPONSE ANY UNEXPECTED CASE
+
+// to catch any error while server up, we need a structure like that
+const server = app.listen(port, () => {
+  console.log(`Server is listening on port ${port}. http://localhost:${port}`);
+});
+
+// if server catch any error on network
+server.on("error", (error) => {
+  console.error("Server error:", error);
+});
+
+
+
+*** CAUTION: Static or Dynamic variables are must be used for only unique cases (ports, app etc.). Otherwise,
+each ops from any client can be reflected to other client. DO NOT FORGET THAT THIS IS SERVER !!!
+
+
+
+
+*** AT LEAST ONE GET ROUTE SHOULD BE DEFINED
+Without default adjustment, we can get an warning such "Cannot Get". This warning will be seen for other
+methods that not defined.
+
+
+
+
+*** NOT ALLOWED METHODS
+
+CAUTION: for the first method, we did not use next() so if the incoming request can be matched with
+any defined route, app.all() method wont be activated. Otherwise, app.all will be activated with 
+defined middleware 
+
+import express from "express";
+
+const app = express();
+
+// GRAB ALL THE VALID METHODS
+function methodNotAllowed(allowedMethods) {
+  return (req, res) => {
+    // defines all the allowed methods to response header with key "Allow"
+    res.set("Allow", allowedMethods.join(", ")); // String
+    return res.status(405).send({
+      error: "Method Not Allowed",
+      allowedMethods: allowedMethods,
+    });
+  };
+}
+
+
+// OUTPUT
+
+{
+  "error": "Method Not Allowed",
+  "allowedMethods": ["POST"]
+}
+
+
+
+
+// FIRST GRAB THE ALLOWED METHOD
+app.post("/submit", (req, res) => {
+  res.send("SUCCESSFUL");
+});
+
+// GRAB ALL UNDEFINED METHOD FOR ROUTE
+// Caution: middleware can be called with a parameter
+app.all("/submit", methodNotAllowed(["POST"]));
+
+app.listen(3000);

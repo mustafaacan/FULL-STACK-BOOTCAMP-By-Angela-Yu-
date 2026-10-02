@@ -4,6 +4,8 @@ import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+console.log(__dirname);
+console.log(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 3000;
@@ -14,12 +16,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 function validateSubmit(req, res, next) {
   console.log("Requested body", req.body);
 
-  // BY the using UI, some security policies can be satisfied. But, when someone try to post any data from tools such postman and
-  // swagger, there might be a security leak so while writing the code, all the possibilites should be considered
-  if (
-    Object.keys(req.body).includes("pet") &&
-    Object.keys(req.body).includes("street")
-  ) {
+  // BY the using UI, some security policies can be satisfied. But, when someone try to post any data from tools
+  // such postman and swagger, there might be a security leak so while writing the code, all the possibilites
+  // should be considered
+  if (req.body.pet && req.body.street) {
     const valueCheck = Object.values(req.body).filter((item) => {
       return item.trim() != "" && item != null;
     });
@@ -40,7 +40,6 @@ function validateSubmit(req, res, next) {
     console.log(
       "Incoming body keys should include 'pet' and 'street' in the same time",
     );
-    ("Incoming body keys should include 'pet' and 'street' in the same time");
     res.status(400).json({
       message:
         "Incoming body keys should include 'pet' and 'street' in the same time",

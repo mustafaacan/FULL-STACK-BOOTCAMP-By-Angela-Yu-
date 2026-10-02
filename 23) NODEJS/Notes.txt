@@ -97,6 +97,20 @@ const filePath = path.join("data", "users", "message.txt");
 // Output --> data/users/message.txt
 
 
+More Example
+
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+// import.meta.url --> current file path
+// fileURLToPath(import.meta.url) --> full path according to operating system (EXPRESSJS/Middleware/index1.js)
+// dirname(fileURLToPath(import.meta.url)) --> main folder name that include current file. (EXPRESSJS/Middleware)
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+
+res.sendFile(__dirname + "/public/index.html"); (EXPRESSJS/Middleware/public/index.html)
+
+
 
 
 
