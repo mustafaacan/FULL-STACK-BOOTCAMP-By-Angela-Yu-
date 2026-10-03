@@ -1,4 +1,3 @@
-//To see how the final website should work, run "node solution.js".
 //Make sure you have installed all the dependencies with "npm i".
 //The password is ILoveProgramming
 
@@ -30,15 +29,15 @@ function passwordCheck(req, res, next) {
 app.use(passwordCheck);
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/main.html");
   userIsAuthorised = false;
+  res.sendFile(__dirname + "/public/main.html");
 });
 
 app.post("/check", (req, res) => {
   if (userIsAuthorised === true) {
     res.sendFile(__dirname + "/public/secret.html");
   } else {
-    res.sendFile(__dirname + "/public/main.html");
+    res.redirect("/");
   }
 });
 

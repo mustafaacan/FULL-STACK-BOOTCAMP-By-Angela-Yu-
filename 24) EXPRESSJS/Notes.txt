@@ -200,6 +200,10 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
 
 MIDDLEWARES
 
+*** NEXT() & APP.USE() (for general middlewares) are 2 important topics
+1. After each defined middlewares, next should be defined.
+2. For general middleware app.use() should be used.
+
 all available middlewares for express --> https://expressjs.com/en/resources/middleware
 
 Middleware is a function that runs between receiving a request and sending a
@@ -407,3 +411,78 @@ app.post("/submit", (req, res) => {
 app.all("/submit", methodNotAllowed(["POST"]));
 
 app.listen(3000);
+
+
+
+
+
+BUILD IN MIDDLEWARE EXAMPLES
+
+import morgan from "morgan";
+app.use(morgan("combined")); --> logging the incoming request HTTP types and response status
+
+
+
+
+
+
+RES.SENDFILE vs. RES.RENDER
+
+*** for res.render() ejs based file needed. HTML files cannot be rendered without some adjustment as below,
+
+import ejs from "ejs";
+
+app.engine("html", ejs.renderFile);
+app.set("view engine", "html");
+app.set("views", join(__dirname, "views"));
+
+Shortly, using EJS is more clear for express ops. for static HTML files, we may use res.sendFile()
+
+
+
+
+
+SENDING DATA FROM HTML FORM
+
+action --> should be redirecting to necessary URL
+method --> represents the HTTP Method
+
+<form action="/check" method="POST">
+    <label for="password">Password:</label>
+    <input type="text" id="password" name="password" required>
+    <input type="submit" value="Submit">
+</form>
+
+
+
+
+
+
+BODY DESTRUCTURING
+
+Assume that incoming body as below
+
+req.body = {
+  newVariable: "Mustafa",
+  age: 25,
+  city: "İstanbul",
+};
+
+const { newVariable } = req.body;
+console.log(newVariable); // "Mustafa"
+
+const { newVariable, age } = req.body;
+
+
+*** If the key-value pair is not defined, result will be undefined.
+
+req.body = { age: 25 };
+const newVariable = req.body?.newVariable;
+
+console.log(newVariable); // undefined
+
+
+*** For this kind of case, we can assign a default value
+
+const { newVariable = "Guest" } = req.body;
+const newVariable = req.body?.newVariable ?? "Guest";

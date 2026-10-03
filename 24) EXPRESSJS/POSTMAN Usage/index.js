@@ -5,7 +5,8 @@ const port = 3001;
 
 app.use(express.json()); // as middleware
 
-let variable;
+let variable; // NEVER USE ANY VARIABLE FOR EVEN DYNAMİC VALUES. THIS IS A SERVER. EVERYONE CAN SEE THAT VARIABLE
+// SO THERE WILL BE A CHAOTIC SYSTEM BEHAVIOUR OR EVEN SECURTY ISSUE
 
 // *********************
 // Let’s practice using Postman. Make sure your server is running with nodemon.
@@ -20,7 +21,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const { newVariable } = req.body;
+  const { newVariable } = req.body?.newVariable;
   console.log("Old value: ", variable);
   console.log("New Value: ", newVariable);
   variable = newVariable;
