@@ -13,10 +13,9 @@ const dayList = {
   6: "Saturday",
 };
 
-let day;
 // Sunday - Saturday : 0 - 6
 function dayHandler(req, res, next) {
-  day = new Date().getDay();
+  const day = new Date().getDay();
   if (day === 0 || day === 6) {
     res.message = { day: "weekend", advice: "It's time to have fun!" };
   } else {
@@ -30,7 +29,10 @@ app.use(dayHandler);
 
 app.get("/", (req, res) => {
   console.log(res.message);
-  console.log(day);
+  console.log(
+    res.message["dayList"],
+    Object.values(dayList).indexOf(res.message["dayList"]),
+  );
   res.render("index.ejs", res.message);
 });
 
