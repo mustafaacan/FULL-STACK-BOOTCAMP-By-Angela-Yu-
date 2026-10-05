@@ -22,6 +22,10 @@ app.get("/", (req, res) => {
   res.render("index.ejs");
 });
 
+app.get("/submit", (req, res) => {
+  res.redirect("/");
+});
+
 app.post("/submit", generateBandName, (req, res) => {
   res.render("index.ejs");
 });

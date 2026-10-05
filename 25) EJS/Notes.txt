@@ -1,12 +1,19 @@
 
 EJS --> Templating language
 
+*** RES.RENDER() method is working with EJS (not HTML). Render method mentioning that 
+
 Using EJS is more clear and easy way to manage the frond End activities
 than sending files or HTML structures
 
 For instace using res.sendFile(...) provides a static approach
 
 We can use res.render(...) to provide EJS key-value pairs
+
+
+
+
+
 
 
 EJS TAGS
@@ -38,14 +45,19 @@ this keyword is a built-in keyword
 
 
 
+
+
+
+
+
 LAYOUT AND PARTIAL TEMPLATE
 
 To use the locale styling css files or images, express static should be used
 
 app.use(express.static(<"public" folder path>));
 
-static files usually deploy under the "public" folder so path for the public folder is enough for the define all static elements
-located under the public folder
+static files usually deploy under the "public" folder so path for the public folder is enough for the define 
+all static elements located under the public folder
 
 public/
 └── styles/
@@ -55,3 +67,230 @@ On the other hand, for cdn structures, we do not need to use static usage
 
 for partial usage, we can use the structure below
 <%- include('<FILENAME.ejs>') %> --> insert another EJS files (will be given as URL)
+
+
+
+
+
+
+For EJS, reusable files such header, footer should be divided correctly (please check the Band Generator Project)
+
+view/
+└── partials (folder)
+    └── ...ejs
+└── ...ejs
+└── ...ejs
+
+
+
+
+
+
+
+
+
+EXPRESS AND EJS LOCALS — SUMMARY AND EXAMPLES
+
+Locals are named values available to a template while it renders. With the
+default EJS configuration, use the name directly (bandName) or access it
+through the locals object (locals.bandName).
+
+1. Passing data directly with res.render()
+
+app.set("view engine", "ejs"); (OPTIONAL)
+
+app.get("/", (req, res) => {
+  res.render("index", { bandName: "The Beatles" });
+});
+
+Inside views/index.ejs:
+
+<h1><%= bandName %></h1>
+
+Express asks EJS to render the template with the supplied data, then sends
+the resulting HTML to the browser. The browser does not receive EJS code.
+
+2. res.locals: request-specific template data
+
+res.locals is a built-in Express object. Middleware can set values that
+later middleware and route handlers can access during the same request.
+These values are automatically available to templates rendered with res.render().
+
+// Define middleware before the routes that need these values.
+app.use((req, res, next) => {
+  res.locals.bandName = "The Beatles";
+  next();
+});
+
+app.get("/", (req, res) => {
+  res.render("index"); // No need to pass bandName again.
+});
+
+Inside views/index.ejs:
+
+<h1><%= bandName %></h1>
+
+For optional data, checking locals avoids referencing a missing variable:
+
+<% if (locals.bandName) { %>
+  <h1><%= bandName %></h1>
+<% } %>
+
+3. req.locals versus res.locals
+
+req.locals is NOT a built-in Express object. You must create it before
+using req.locals.bandName; otherwise, assigning that property throws an error.
+It can carry custom data between middleware during the same request, but
+Express does not automatically pass it to EJS.
+
+app.get("/example", (req, res) => {
+  req.locals = { bandName: "The Beatles" };
+  res.render("index", { bandName: req.locals.bandName });
+});
+
+Use res.locals for data intended for templates. Custom request properties
+(such as req.user) can carry data needed by request-handling code.
+Neither custom request properties nor res.locals persist across requests.
+
+4. What happens after res.redirect()?
+
+A redirect tells the browser to make a NEW request. Values from the previous
+request's res.locals or req.locals are not transferred to that new request.
+
+app.get("/first", (req, res) => {
+  res.locals.bandName = "The Beatles";
+  res.redirect("/second");
+});
+
+app.get("/second", (req, res) => {
+  console.log(res.locals.bandName); // undefined, unless set again.
+  res.send("Second page");
+});
+
+If shared middleware runs on /second and sets bandName, the value appears
+again because the middleware assigns it again, not because it survived.
+To retain data across requests, use a session, a database, or URL parameters
+as appropriate. For example, middleware can read a user from a session and
+assign it to res.locals.user for each request !!!
+
+5. app.locals: application-wide values
+
+app.locals contains shared template values that persist for the lifetime
+of the application process:
+
+app.locals.siteName = "My Music App";
+
+Use it for shared values such as a site name, not individual users' data.
+For the same key, data passed directly to res.render() takes precedence
+over res.locals, and res.locals takes precedence over app.locals.
+
+6. Example: a dynamic iframe URL
+
+app.get("/video", (req, res) => {
+  res.locals.videoUrl = "https://www.youtube.com/embed/VIDEO_ID";
+  res.render("video");
+});
+
+Inside views/video.ejs:
+
+<iframe src="<%= videoUrl %>" title="Video" allowfullscreen></iframe>
+
+The URL is inserted when the server renders the page. To change it without
+reloading the page, use browser-side JavaScript or React.
+If a URL comes from user input, validate its protocol, host, and expected
+format. <%= %> escapes HTML characters; it does not validate URL safety.
+
+QUICK REFERENCE
+
+res.render("view", { key: value }) -> Data for that render call.
+res.locals.key = value            -> Data for the current request and templates.
+req.locals = { key: value }        -> Custom request data; pass it to EJS explicitly.
+app.locals.key = value            -> Shared application-wide template data.
+res.redirect("/path")             -> A new request; request locals do not carry over.
+
+
+
+
+
+
+
+
+
+
+
+
+PASSING OBJECTS TO EJS: SHORTHAND, RENAMING, AND NESTING
+
+The second argument of res.render() is an object containing template locals.
+Its property names determine how you access the values inside EJS.
+These are ordinary JavaScript object rules, not special EJS syntax.
+
+1. Property shorthand: { genre, sort }
+
+const genre = "rock";
+const sort = "name";
+
+res.render("bands", { genre, sort });
+
+This is exactly equivalent to:
+
+res.render("bands", {
+  genre: genre,
+  sort: sort
+});
+
+The property names and variable names are the same, so JavaScript allows
+the shorter form. Access each value directly in views/bands.ejs:
+
+<p>Genre: <%= genre %></p>
+<p>Sort: <%= sort %></p>
+
+2. Renaming a value: { data: genre }
+
+res.render("bands", { data: genre });
+
+The key on the left (data) is the name available in the template.
+The expression on the right (genre) supplies its value.
+Because genre is "rock", data is also the string "rock":
+
+<p><%= data %></p>
+
+Do not use data.genre here: data is a string, not an object with a genre
+property. The variable genre is not separately passed by this render call.
+
+3. Grouping values inside a nested object
+
+res.render("bands", {
+  data: {
+    genre,
+    sort
+  }
+});
+
+Now data is an object: { genre: "rock", sort: "name" }.
+Access its properties through data in EJS:
+
+<p>Genre: <%= data.genre %></p>
+<p>Sort: <%= data.sort %></p>
+
+You can also create the object first:
+
+const filters = { genre: "rock", sort: "name" };
+res.render("bands", { data: filters });
+
+This also supports data.genre and data.sort because filters is an object.
+Therefore, { data: genre } could support data.genre only if the variable
+named genre itself held an object containing a genre property.
+
+KEY TAKEAWAY
+
+data is not a reserved EJS keyword in these examples; it is a chosen key.
+You could use filters, band, or another suitable name instead.
+
+{ genre, sort }                 -> EJS: genre and sort
+{ data: genre }                 -> EJS: data (the value of genre)
+{ data: { genre, sort } }       -> EJS: data.genre and data.sort
+
+Choose direct locals for simple values and nested objects when grouping
+related data makes the template clearer. Match EJS access to the actual
+shape of the object you pass.
