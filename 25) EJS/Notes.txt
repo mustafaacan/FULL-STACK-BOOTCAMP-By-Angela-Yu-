@@ -294,3 +294,19 @@ You could use filters, band, or another suitable name instead.
 Choose direct locals for simple values and nested objects when grouping
 related data makes the template clearer. Match EJS access to the actual
 shape of the object you pass.
+
+
+
+
+EXAMPLE USAGE
+
+app.get("/", (req, res) => {
+  const data = {
+    title: "EJS Tags",
+    seconds: new Date().getSeconds(),
+    items: ["apple", "banana", "cherry"],
+    htmlContent: "<strong>This is some strong text</strong>",
+  };
+  // WHEN THE RENDER DATA SENT AS OBJECT, DO NOT USE DATA.KEY, USE KEY DIRECTLY
+  res.render("index.ejs", data);
+});
