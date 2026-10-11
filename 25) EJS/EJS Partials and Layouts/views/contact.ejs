@@ -2,10 +2,50 @@
 
 <h1>Contact Me</h1>
 <form action="/submit" method="POST">
-  <input name="name" type="text" class="feedback-input" placeholder="Name" />
-  <input name="email" type="text" class="feedback-input" placeholder="Email" />
-  <textarea name="text" class="feedback-input" placeholder="Comment"></textarea>
+  <input
+    name="name"
+    id="name"
+    type="text"
+    class="feedback-input"
+    placeholder="Name"
+    required
+  />
+  <input
+    name="email"
+    type="email"
+    class="feedback-input"
+    placeholder="Email"
+    required
+  />
+  <textarea
+    name="text"
+    id="text"
+    class="feedback-input"
+    placeholder="Comment"
+  ></textarea>
+  <p id="count" style="margin-top: -15px"></p>
   <input type="submit" value="SUBMIT" />
 </form>
+
+<script>
+  const nameInput = document.getElementById("name");
+  const textInput = document.getElementById("text");
+  const counter = document.getElementById("count");
+  counter.textContent = `${textInput.value.length} / 400`;
+
+  function limitCharacters(input, maxLength) {
+    input.addEventListener("input", () => {
+      if (input.value.length > maxLength) {
+        input.value = input.value.slice(0, maxLength);
+      }
+      if (input === textInput) {
+        counter.textContent = `${textInput.value.length} / 400`;
+      }
+    });
+  }
+
+  limitCharacters(nameInput, 50);
+  limitCharacters(textInput, 400);
+</script>
 
 <%- include("partials/footer.ejs") %>
