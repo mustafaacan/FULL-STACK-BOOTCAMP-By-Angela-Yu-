@@ -77,6 +77,9 @@ CommonJS equivalent:
 const { writeFile, readFile } = require("node:fs/promises");
 
 
+
+
+
 ***********
 
 - PATH GENERATION
@@ -131,6 +134,23 @@ const updatedObj = JSON.stringify({ ...latestUrlObj, ...obj }, null, 2);
 // 1) If they have common keys, the value of the second object will be accepted.
 // 2) null --> there wont be any filter or special function while merging
 // 3) 2 --> indent value for more readible files
+
+
+
+A REAL TIME EXAMPLE
+fs.readFileSync --> waits automatically until the reading completed.
+JSON.parse() --> To use the Json file inside the code, we need to convert it to JS objects
+
+// To import the JSON file inside index.js
+const recipeJSON = fs.readFileSync(
+  new URL("./recipe.json", import.meta.url),
+  "utf-8",
+);
+
+// JS Object conversion
+const recipes = JSON.parse(recipeJSON);
+
+
 
 
 
