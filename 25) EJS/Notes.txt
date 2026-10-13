@@ -310,3 +310,38 @@ app.get("/", (req, res) => {
   // WHEN THE RENDER DATA SENT AS OBJECT, DO NOT USE DATA.KEY, USE KEY DIRECTLY
   res.render("index.ejs", data);
 });
+
+
+CRITICAL POINT : If we send data without a capsule, we use it directly with its keys 
+instead of using it in the form of `locals.<data>` on EJS side. For instead, for the sent data above,
+we need to adjust the EJS side as below
+
+<h1><%= title %></h1>
+<p>Saniye: <%= seconds %></p>
+
+<ul>
+  <% items.forEach(item => { %>
+    <li><%= item %></li>
+  <% }); %>
+</ul>
+
+<div><%- htmlContent %></div>
+
+
+
+THE OTHER OPTION IS
+
+res.render("index.ejs", { data });
+// { data: data } SAME !!!!
+
+
+<h1><%= data.title %></h1>
+<p>Saniye: <%= data.seconds %></p>
+
+<ul>
+  <% data.items.forEach(item => { %>
+    <li><%= item %></li>
+  <% }); %>
+</ul>
+
+<div><%- data.htmlContent %></div>
