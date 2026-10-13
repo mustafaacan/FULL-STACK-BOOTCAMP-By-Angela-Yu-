@@ -13,19 +13,20 @@
     <button type="submit" value="chicken" name="choice">🍗</button>
     <button type="submit" value="beef" name="choice">🥩</button>
     <button type="submit" value="fish" name="choice">🐟</button>
+    <button type="submit" value="deneme" name="choice">🐟</button>
   </form>
 
 
   <div id="recipeContainer" class="hidden">
-    <% if (locals.obj) { %>
+    <% if (name) { %>
       <h2 id="recipeTitle">
-        <%= obj.name %>
+        <%= name %>
       </h2>
       <h3>Ingredients:</h3>
       <ul id="ingredientsList">
-        <li> <%= obj.proteinName %> , <%= obj.preparation%> </li>
-        <li><%= obj.salsaName %> </li>
-          <% obj.topping.forEach(element => { %>
+        <li> <%= proteinName %> , <%= preparation%> </li>
+        <li><%= salsaName %> </li>
+          <% topping.forEach(element => { %>
           <li><%= element %></li>
           <% }) %>
       </ul>

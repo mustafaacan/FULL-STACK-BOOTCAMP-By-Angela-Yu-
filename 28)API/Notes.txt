@@ -10,9 +10,13 @@ IOT architectures also can use API structures.
 
 
 
+
 API TYPES
 1. API TYPES ACCORDING TO SCTRUCTURE
 2. API TYPES ACCORDING TO USAGE PURPOSE
+
+
+
 
 
 
@@ -76,6 +80,8 @@ such front end design or express based backend
 
 
 
+
+
 RATE LIMITING
 
 a technique used to control the number of requests a client can make to a server within a set time period.
@@ -84,6 +90,8 @@ Usually remaining rate limit can be seen inside the response's header.
 Request tracking: The server identifies clients using an IP address, user ID, or API key.
 Threshold comparison: It checks recent usage against the allowed maximum.
 Rejection: If a client goes over the limit, the server blocks extra requests and sends back a "429 Too Many Requests" status code
+
+
 
 
 
@@ -101,6 +109,9 @@ https://api.example.com/users --> https://api.example.com (baseURL), /users (end
 
 
 
+
+
+
 QUERY PARAMETERS
 
 ** Critical point : Do Not Forget "?" before query parameter(s)
@@ -115,6 +126,10 @@ https://api.example.com/users?country=Turkey&sort=name&page=2
 
 
 
+
+
+
+
 PATH PARAMETERS
 
 defines a specific resources
@@ -125,6 +140,11 @@ https://api.example.com/users/42 --> response will be user with id 42, warning m
 
 404 not found --> user does not existing
 400 bad request --> path type should be integer instead of string 
+
+
+
+
+
 
 
 
@@ -159,6 +179,28 @@ JSON to JS --> const jsObject = JSON.parse(JSONdata) --> Since incoming JSON act
                                                          we cannot use object built in functions
 
 ** Without comversion, json data cannot be managed inside the JS code 
+
+
+
+A REAL TIME USAGE EXAMPLE
+
+A REAL TIME EXAMPLE
+fs.readFileSync --> waits automatically until the reading completed.
+JSON.parse() --> To use the Json file inside the code, we need to convert it to JS objects
+
+// To import the JSON file inside index.js
+const recipeJSON = fs.readFileSync(
+  new URL("./recipe.json", import.meta.url),
+  "utf-8",
+);
+
+// JS Object conversion
+const recipes = JSON.parse(recipeJSON);
+
+
+
+
+
 
 
 
@@ -282,3 +324,141 @@ HTTPS: How are the credentials and data transported securely?
 In a production environment, an API that uses API keys or tokens should always use HTTPS. 
 Credentials should be sent through headers, kept out of URLs and logs, 
 rotated when appropriate, and limited to the minimum permissions required.
+
+
+
+
+
+
+
+
+
+
+
+
+PASSING OBJECTS TO EJS: SHORTHAND, RENAMING, AND NESTING
+
+The second argument of res.render() is an object containing template locals.
+Its property names determine how you access the values inside EJS.
+These are ordinary JavaScript object rules, not special EJS syntax.
+
+1. Property shorthand: { genre, sort }
+
+const genre = "rock";
+const sort = "name";
+
+res.render("bands", { genre, sort });
+
+This is exactly equivalent to:
+
+res.render("bands", {
+  genre: genre,
+  sort: sort
+});
+
+The property names and variable names are the same, so JavaScript allows
+the shorter form. Access each value directly in views/bands.ejs:
+
+<p>Genre: <%= genre %></p>
+<p>Sort: <%= sort %></p>
+
+2. Renaming a value: { data: genre }
+
+res.render("bands", { data: genre });
+
+The key on the left (data) is the name available in the template.
+The expression on the right (genre) supplies its value.
+Because genre is "rock", data is also the string "rock":
+
+<p><%= data %></p>
+
+Do not use data.genre here: data is a string, not an object with a genre
+property. The variable genre is not separately passed by this render call.
+
+3. Grouping values inside a nested object
+
+res.render("bands", {
+  data: {
+    genre,
+    sort
+  }
+});
+
+Now data is an object: { genre: "rock", sort: "name" }.
+Access its properties through data in EJS:
+
+<p>Genre: <%= data.genre %></p>
+<p>Sort: <%= data.sort %></p>
+
+You can also create the object first:
+
+const filters = { genre: "rock", sort: "name" };
+res.render("bands", { data: filters });
+
+This also supports data.genre and data.sort because filters is an object.
+Therefore, { data: genre } could support data.genre only if the variable
+named genre itself held an object containing a genre property.
+
+KEY TAKEAWAY
+
+data is not a reserved EJS keyword in these examples; it is a chosen key.
+You could use filters, band, or another suitable name instead.
+
+{ genre, sort }                 -> EJS: genre and sort
+{ data: genre }                 -> EJS: data (the value of genre)
+{ data: { genre, sort } }       -> EJS: data.genre and data.sort
+
+Choose direct locals for simple values and nested objects when grouping
+related data makes the template clearer. Match EJS access to the actual
+shape of the object you pass.
+
+
+
+
+EXAMPLE USAGE
+
+app.get("/", (req, res) => {
+  const data = {
+    title: "EJS Tags",
+    seconds: new Date().getSeconds(),
+    items: ["apple", "banana", "cherry"],
+    htmlContent: "<strong>This is some strong text</strong>",
+  };
+  // WHEN THE RENDER DATA SENT AS OBJECT, DO NOT USE DATA.KEY, USE KEY DIRECTLY
+  res.render("index.ejs", data);
+});
+
+
+CRITICAL POINT : If we send data without a capsule, we use it directly with its keys 
+instead of using it in the form of `locals.<data>` on EJS side. For instead, for the sent data above,
+we need to adjust the EJS side as below
+
+<h1><%= title %></h1>
+<p>Saniye: <%= seconds %></p>
+
+<ul>
+  <% items.forEach(item => { %>
+    <li><%= item %></li>
+  <% }); %>
+</ul>
+
+<div><%- htmlContent %></div>
+
+
+
+THE OTHER OPTION IS
+
+res.render("index.ejs", { data });
+// { data: data } SAME !!!!
+
+
+<h1><%= data.title %></h1>
+<p>Saniye: <%= data.seconds %></p>
+
+<ul>
+  <% data.items.forEach(item => { %>
+    <li><%= item %></li>
+  <% }); %>
+</ul>
+
+<div><%- data.htmlContent %></div>

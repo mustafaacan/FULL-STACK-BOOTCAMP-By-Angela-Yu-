@@ -18,6 +18,8 @@ const recipeJSON = fs.readFileSync(
 const recipes = JSON.parse(recipeJSON);
 
 const findTargetTaco = (target) => {
+  // Array.find() => search for the item inside the array.
+  // if found, returns the item immediately otherwise returns UNDEFINED
   return recipes.find(
     (recipe) =>
       recipe.ingredients.protein.name.toLowerCase() === target.toLowerCase(),
@@ -31,20 +33,31 @@ app.get("/", (req, res) => {
 app.post("/recipe", (req, res) => {
   // Finding the correct taco recipe
   const taco = findTargetTaco(req.body["choice"]);
+  let obj;
 
-  // Rendering object prep.
-  const obj = {
-    name: taco.name,
-    proteinName: taco.ingredients.protein.name,
-    preparation: taco.ingredients.protein.preparation,
-    salsaName: taco.ingredients.salsa.name,
-  };
+  if (taco === undefined) {
+    obj = {
+      name: "Undefined Taco Name",
+      proteinName: "",
+      preparation: "",
+      salsaName: "",
+    };
+    obj["topping"] = [];
+  } else {
+    // Rendering object prep.
+    obj = {
+      name: taco.name,
+      proteinName: taco.ingredients.protein.name,
+      preparation: taco.ingredients.protein.preparation,
+      salsaName: taco.ingredients.salsa.name,
+    };
 
-  obj["topping"] = taco.ingredients.toppings.map((element) => {
-    return element.quantity + " of " + element.name;
-  });
+    obj["topping"] = taco.ingredients.toppings.map((element) => {
+      return element.quantity + " of " + element.name;
+    });
+  }
 
-  res.render("index.ejs", { obj });
+  res.render("index.ejs", obj);
 });
 
 app.listen(port, () => {
