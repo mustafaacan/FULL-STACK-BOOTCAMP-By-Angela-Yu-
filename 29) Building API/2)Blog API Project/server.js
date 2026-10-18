@@ -18,7 +18,10 @@ app.get("/", async (req, res) => {
     console.log(response);
     res.render("index.ejs", { posts: response.data });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching posts" });
+    console.log(error);
+    res.status(500).json({
+      message: error.response?.data?.message ?? "Error fetching posts",
+    });
   }
 });
 
@@ -58,7 +61,7 @@ app.post("/api/posts/:id", async (req, res) => {
   try {
     const response = await axios.patch(
       `${API_URL}/posts/${req.params.id}`,
-      req.body
+      req.body,
     );
     console.log(response.data);
     res.redirect("/");

@@ -39,10 +39,26 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Özellikle sorgulaman gerek neden 2 farklı server çalıştırıyoruz ?
+// Burası data management server ise verilerin hazırlandığı yer.
+// WEB TARAFINDA SERVER ÇALIŞTIR.
 
-//Write your code here//
+// **TÜM ROUTERLARDAN ÖNCE GEREKEN KONTROLLER İÇİN MİDDLEWARE TANIMLA
 
-//CHALLENGE 1: GET All posts
+//GET All posts
+app.get("/posts", (req, res) => {
+  try {
+    if (!Array.isArray(posts)) {
+      return res.status(500).json({ message: "Posts type is not an array" });
+    }
+
+    if (posts.length < 1) {
+      return res.json([]);
+    }
+    return res.status(200).json(posts);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
 
 //CHALLENGE 2: GET a specific post by id
 
