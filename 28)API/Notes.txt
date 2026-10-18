@@ -20,7 +20,7 @@ API TYPES
 
 
 
-
+################################################################
 
 API TYPES ACCORDING TO SCTRUCTURE
 
@@ -96,6 +96,8 @@ Rejection: If a client goes over the limit, the server blocks extra requests and
 
 
 
+################################################################
+
 ENDPOINT, PATH PARAMETERS, QUERY PARAMETERS
 
 For Example --> https://bored-api.appbrewery.com/
@@ -129,7 +131,6 @@ https://api.example.com/users?country=Turkey&sort=name&page=2
 
 
 
-
 PATH PARAMETERS
 
 defines a specific resources
@@ -149,7 +150,7 @@ https://api.example.com/users/42 --> response will be user with id 42, warning m
 
 
 
-
+################################################################
 
 JSON (JS Object Notation)
 
@@ -204,7 +205,7 @@ const recipes = JSON.parse(recipeJSON);
 
 
 
-
+################################################################
 
 AUTHENTICATION vs. AUTHORIZATION
 
@@ -331,10 +332,7 @@ rotated when appropriate, and limited to the minimum permissions required.
 
 
 
-
-
-
-
+################################################################
 
 PASSING OBJECTS TO EJS: SHORTHAND, RENAMING, AND NESTING
 
@@ -465,7 +463,7 @@ res.render("index.ejs", { data });
 
 
 
-###################################################
+################################################################
 EXAMPLE USAGE
 
 // FROM AN ARRAY OR OBJECT, HOW WE CAN CHECK THE 
@@ -477,3 +475,288 @@ const findTargetTaco = (target) => {
       recipe.ingredients.protein.name.toLowerCase() === target.toLowerCase(),
   );
 };
+
+
+
+
+
+################################################################
+SERVER-SIDE AXIOS, AUTHENTICATION, AND ALTERNATIVES
+
+WHY USE AXIOS ON THE SERVER?
+
+Axios is an HTTP client: it helps your server send requests to another API.
+Express handles incoming requests; Axios sends outgoing requests.
+
+Example flow in an EJS application:
+
+Browser -> Express -> Axios -> External activity API
+              |
+              -> Render EJS with the API data -> Send HTML to the browser
+
+import axios from "axios";
+
+app.get("/", async (req, res) => {
+  try {
+    const response = await axios.get("https://api.example.com/activities", {
+      timeout: 5000,
+    });
+
+    res.render("index.ejs", { data: response.data });
+  } catch (error) {
+    res.status(502).send("Could not retrieve activities.");
+  }
+});
+
+The example URLs are placeholders. Replace them with actual API endpoints.
+
+Benefits of making API requests on the server:
+- Keep secret API keys on the server instead of exposing them in browser code.
+- Filter and transform API data before passing it to an EJS template.
+- Combine results from multiple APIs.
+- Centralize headers, timeouts, and error handling.
+
+AUTHENTICATION WITH AXIOS
+
+Axios can send credentials, but the receiving server verifies them.
+Axios does not create a user authentication system by itself.
+The following examples use environment variables for secret values.
+Do not expose those values in rendered HTML or commit them to source control.
+Send credentials over HTTPS.
+
+1. BASIC AUTHENTICATION
+
+Use the auth option to send a username and password with HTTP Basic Auth:
+
+const response = await axios.get("https://api.example.com/profile", {
+  auth: {
+    username: process.env.API_USERNAME,
+    password: process.env.API_PASSWORD,
+  },
+});
+
+The auth option is specifically for Basic Auth. It sets the Authorization
+header and overrides a custom Authorization header in the same request.
+
+2. BEARER TOKEN
+
+Send an access token in the Authorization header. A JWT can be used this way,
+but not every Bearer token is a JWT.
+
+const response = await axios.get("https://api.example.com/profile", {
+  headers: {
+    Authorization: `Bearer ${process.env.API_TOKEN}`,
+  },
+});
+
+3. API KEY
+
+Use the header name required by the API documentation:
+
+const response = await axios.get("https://api.example.com/activities", {
+  headers: {
+    "x-api-key": process.env.API_KEY,
+  },
+});
+
+The API determines the key's name and location. Some APIs require a header;
+others require a query parameter or another format.
+
+4. OAUTH
+
+Axios can make the HTTP requests needed to obtain or refresh an access token
+and then send that token in subsequent requests. The OAuth flow must be
+implemented separately or handled by an appropriate authentication library.
+
+ALTERNATIVE: BUILT-IN FETCH
+
+Modern Node.js versions include fetch(), so basic HTTP requests do not
+require an additional package.
+
+const response = await fetch("https://api.example.com/activities", {
+  headers: {
+    Authorization: `Bearer ${process.env.API_TOKEN}`,
+  },
+});
+
+if (!response.ok) {
+  throw new Error(`API error: ${response.status}`);
+}
+
+const data = await response.json();
+
+AXIOS VS FETCH
+
+Installation:
+- Axios: install a separate package (npm install axios).
+- Fetch: included in modern Node.js versions.
+
+JSON responses:
+- Axios: JSON responses are normally parsed automatically; use response.data.
+- Fetch: explicitly parse the response with await response.json().
+
+HTTP errors such as 404 and 500:
+- Axios: rejects the promise by default, so try/catch handles these responses.
+  This behavior can be customized with validateStatus.
+- Fetch: does not reject just because of an HTTP error status. Check
+  response.ok or response.status yourself. Network failures can still reject.
+
+Both can send authentication headers. For a simple activity API application,
+either option works; Axios is a convenience rather than a requirement.
+
+
+
+
+AXIOS METHODS AND ARGUMENT ORDER
+
+Axios supports GET, POST, PUT, PATCH, and DELETE. The API determines which
+methods are supported and what each endpoint does.
+
+For POST, PUT, and PATCH, the argument order is URL, body, then config:
+
+axios.post(url, data, config);
+axios.put(url, data, config);
+axios.patch(url, data, config);
+
+await axios.post(
+  "https://api.example.com/activities", // URL
+  { activity: "Read a book", participants: 1 }, // Request body
+  {
+    headers: { Authorization: `Bearer ${process.env.API_TOKEN}` },
+    params: { language: "en" }, // URL query parameters, not the body
+    timeout: 5000,
+  } // Request configuration
+);
+
+Typical uses: POST creates a resource, PUT replaces a resource, PATCH updates
+selected fields, GET retrieves data, and DELETE removes a resource.
+
+GET and DELETE take config as the second argument:
+
+await axios.get(url, { params: { type: "education" } });
+await axios.delete(url);
+
+If a DELETE endpoint requires a body, put it in config.data:
+
+await axios.delete(url, {
+  data: { id: 2 },
+  headers: { Authorization: `Bearer ${process.env.API_TOKEN}` },
+});
+
+Express app.post() handles an incoming request; axios.post() sends an
+outgoing request. Handle Axios failures with try/catch in async code.
+
+REFERENCES
+https://github.com/axios/axios-docs/blob/master/posts/en/req_config.md
+https://nodejs.org/docs/latest/api/globals.html#fetch
+
+
+
+
+EXAMPLE USAGE
+// WE CAN CREATE AN API CLIENT AND REUSE IT 
+const api = axios.create({
+  baseURL: "https://api.example.com",
+  timeout: 5000,
+  headers: {
+    Authorization: `Bearer ${process.env.API_TOKEN}`
+  }
+});
+
+// Her istekte aynı ayarları tekrar yazmazsın.
+const response = await api.get("/activities");
+
+
+
+
+
+
+
+
+###################################################################
+AXIOS REQUEST INTERCEPTORS
+
+A request interceptor runs before Axios sends a request. It can inspect or
+modify the request configuration before the request is sent.
+
+axios.interceptors.request.use((request) => {
+  // Request headers, such as Authorization and Content-Type.
+  console.log("Headers:", request.headers);
+
+  // Basic Auth configuration: { username, password }.
+  console.log("Auth config:", request.auth);
+
+  // Query parameters that Axios will add to the URL.
+  console.log("Query params:", request.params);
+
+  // The configured URL or path, such as "/activities".
+  console.log("Request URL:", request.url);
+
+  // The HTTP method, such as "get" or "post".
+  console.log("Request Method:", request.method);
+
+  // Return the configuration so Axios can continue processing the request.
+  return request;
+});
+
+This logging example is for learning with dummy credentials. Headers, auth,
+query parameters, and URLs can contain secrets or personal data. Omit or
+redact sensitive values when logging real requests.
+
+EXAMPLE REQUEST
+
+await axios.get("https://api.example.com/activities", {
+  params: { type: "education" },
+  auth: {
+    username: "demo",
+    password: "example",
+  },
+});
+
+Selected interceptor output:
+
+Auth config: { username: 'demo', password: 'example' }
+Query params: { type: 'education' }
+Request URL: https://api.example.com/activities
+Request Method: get
+
+IMPORTANT DETAILS
+
+- request is Axios's request configuration object, not Express's req object.
+  The callback parameter could also be named config.
+- request.auth contains Basic Auth options. A Bearer token normally belongs
+  in request.headers.Authorization, not request.auth.
+- request.url is not necessarily the final URL. Query parameters may not yet
+  be appended, and a relative path may be combined with baseURL later.
+- Some configuration fields may be undefined if they were not provided.
+- This callback must return a valid configuration (or a promise resolving
+  to one). Omitting the return does not provide Axios with that configuration
+  and can cause the request to fail.
+
+MODIFYING A REQUEST
+
+An interceptor can add a shared header before returning the configuration:
+
+axios.interceptors.request.use((request) => {
+  request.headers["X-App-Name"] = "My Activity App";
+  return request;
+});
+
+CUSTOM API CLIENTS
+
+An interceptor registered on the default axios client is not automatically
+registered on clients created with axios.create(). Register it on the
+specific client you use:
+
+const activityApi = axios.create({
+  baseURL: "https://api.example.com",
+  timeout: 5000,
+});
+
+activityApi.interceptors.request.use((request) => {
+  request.headers["X-App-Name"] = "My Activity App";
+  return request;
+});
+
+// This request passes through activityApi's request interceptor.
+const activityResponse = await activityApi.get("/activities");

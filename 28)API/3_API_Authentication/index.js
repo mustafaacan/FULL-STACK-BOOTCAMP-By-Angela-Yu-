@@ -12,8 +12,9 @@ Here's how Express works:
 4) It receives the API response.
 5) It renders the response to HTML using index.ejs and sends it to the browser.
 
-** That why we cannot see any info on browser side
- */
+** That why we cannot see any info on browser side 
+
+*/
 
 // Log the headers of the outgoing Axios request.
 // These headers are not visible in the browser because Axios sends this request from the Express server.
@@ -25,6 +26,7 @@ axios.interceptors.request.use((request) => {
   console.log("Query params:", request.params);
   console.log("Request URL:", request.url);
   console.log("Request Method:", request.method);
+  // This REQUEST does not the same request with REQ
   return request;
 });
 
@@ -32,7 +34,6 @@ const app = express();
 const port = 3000;
 const API_URL = "https://secrets-api.appbrewery.com";
 
-//TODO 1: Fill in your values for the 3 types of auth. Follow the
 // steps on the URL above
 const yourUsername = "mustafa";
 const yourPassword = "MC-240206132";
@@ -53,7 +54,6 @@ app.get("/noAuth", async (req, res) => {
 });
 
 app.get("/basicAuth", async (req, res) => {
-  //TODO 3: Write your code here to hit up the /all endpoint
   //Specify that you only want the secrets from page 2
   //HINT: This is how you can use axios to do basic auth:
   // https://stackoverflow.com/a/74632908
@@ -79,7 +79,6 @@ app.get("/basicAuth", async (req, res) => {
 });
 
 app.get("/apiKey", async (req, res) => {
-  //TODO 4: Write your code here to hit up the /filter endpoint
   //Filter for all secrets with an embarassment score of 5 or greater
   //HINT: You need to provide a query parameter of apiKey in the request.
   try {
@@ -100,7 +99,6 @@ const config = {
 };
 
 app.get("/bearerToken", async (req, res) => {
-  //TODO 5: Write your code here to hit up the /secrets/{id} endpoint
   //and get the secret with id of 42
   //HINT: This is how you can use axios to do bearer token auth:
   // https://stackoverflow.com/a/52645402
