@@ -18,7 +18,7 @@ const recipeJSON = fs.readFileSync(
 const recipes = JSON.parse(recipeJSON);
 
 const findTargetTaco = (target) => {
-  // Array.find() => search for the item inside the array.
+  // Array.find()=> search for the item inside the array.
   // if found, returns the item immediately otherwise returns UNDEFINED
   return recipes.find(
     (recipe) =>

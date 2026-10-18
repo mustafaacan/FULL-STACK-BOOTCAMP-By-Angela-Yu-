@@ -462,3 +462,18 @@ res.render("index.ejs", { data });
 </ul>
 
 <div><%- data.htmlContent %></div>
+
+
+
+###################################################
+EXAMPLE USAGE
+
+// FROM AN ARRAY OR OBJECT, HOW WE CAN CHECK THE 
+const findTargetTaco = (target) => {
+  // Array.find()=> search for the item inside the array.
+  // if found, returns the item immediately otherwise returns UNDEFINED
+  return recipes.find(
+    (recipe) =>
+      recipe.ingredients.protein.name.toLowerCase() === target.toLowerCase(),
+  );
+};
