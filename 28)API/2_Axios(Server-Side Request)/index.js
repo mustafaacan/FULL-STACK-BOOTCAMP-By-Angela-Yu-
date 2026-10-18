@@ -45,6 +45,8 @@ app.post("/", async (req, res) => {
     } else {
       URL = baseURL + `/filter?type=${req.body.type.trim()}`;
     }
+  } else if (req.body.participants.trim()) {
+    URL = baseURL + `/filter?participants=${req.body.participants.trim()}`;
   } else {
     URL = baseURL + "/random";
   }

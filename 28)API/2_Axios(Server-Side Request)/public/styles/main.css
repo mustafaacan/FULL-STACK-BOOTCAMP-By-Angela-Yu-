@@ -76,6 +76,15 @@ h1 {
   background-color: white;
   border-radius: 5px;
 }
+
+.header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  padding: 20px;
+}
+
 .card-info {
   margin-top: 40px;
   display: flex;
