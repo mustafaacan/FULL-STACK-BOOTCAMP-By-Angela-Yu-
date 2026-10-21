@@ -4,7 +4,11 @@ import bodyParser from "body-parser";
 const app = express();
 const port = 4000;
 
-// In-memory data store
+/*
+CAUTION: For WEB side "SERVER.JS" will be used. Index.js stands to simulate server side ops.
+ */
+
+// ############################  In-memory data store ############################
 let posts = [
   {
     id: 1,
@@ -34,39 +38,155 @@ let posts = [
 
 let lastId = 3;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Özellikle sorgulaman gerek neden 2 farklı server çalıştırıyoruz ?
-// Burası data management server ise verilerin hazırlandığı yer.
-// WEB TARAFINDA SERVER ÇALIŞTIR.
-
-// **TÜM ROUTERLARDAN ÖNCE GEREKEN KONTROLLER İÇİN MİDDLEWARE TANIMLA
-
-//GET All posts
-app.get("/posts", (req, res) => {
+const verifyPost = (req, res, next) => {
   try {
     if (!Array.isArray(posts)) {
       return res.status(500).json({ message: "Posts type is not an array" });
     }
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+  return next();
+};
 
-    if (posts.length < 1) {
-      return res.json([]);
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(verifyPost);
+
+// ############################################## ROUTERS ####################################################
+
+//############################  GET All posts ############################
+app.get("/posts", (req, res) => {
+  return res.status(200).json(posts);
+});
+
+//GET a specific post by id
+app.get("/posts/:id", (req, res) => {
+  try {
+    const id = req.params.id;
+    const target = posts.find((item) => {
+      return item.id == id;
+    });
+    if (!target) {
+      return res.status(404).json({ message: "Post not found" });
     }
-    return res.status(200).json(posts);
+    res.status(200).json(target);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 });
 
-//CHALLENGE 2: GET a specific post by id
+//############################  POST a new post ############################
+app.post("/posts", (req, res) => {
+  try {
+    const { title, content, author } = req.body ?? {};
+    const isValid = [title, content, author].every(
+      (value) => typeof value === "string" && value.trim().length > 0,
+    );
 
-//CHALLENGE 3: POST a new post
+    if (!isValid) {
+      return res.status(400).json({
+        message: "Title, content and author are mandatory",
+      });
+    }
 
-//CHALLENGE 4: PATCH a post when you just want to update one parameter
+    lastId++;
+    const date = new Date().toISOString();
+    posts.push({
+      id: lastId,
+      title: title.trim(),
+      content: content.trim(),
+      author: author.trim(),
+      date: date,
+    });
+    res.sendStatus(201);
+  } catch (err) {
+    console.log(req.body);
+    return res.status(500).json({ message: err.message });
+  }
+});
 
-//CHALLENGE 5: DELETE a specific post by providing the post id.
+//############################  PATCH a post ############################
+app.patch("/posts/:id", (req, res) => {
+  try {
+    const id = req.params.id;
+    const target = posts.find((item) => {
+      return item.id == id;
+    });
+    if (!target) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const body = req.body ?? {};
+    // expected values
+    const fields = ["title", "content", "author"];
+    // provided values
+    const providedFields = fields.filter((field) => Object.hasOwn(body, field));
+
+    if (providedFields.length === 0) {
+      return res.status(400).json({
+        message: "Send at least one of title, content or author",
+      });
+    }
+
+    // Each provided field should be valid
+    const isValid = providedFields.every(
+      (field) =>
+        typeof body[field] === "string" && body[field].trim().length > 0,
+    );
+
+    if (!isValid) {
+      return res.status(400).json({
+        message: "Provided fields must be non-empty strings",
+      });
+    }
+
+    // Change control
+    let hasChanges = false;
+
+    for (const field of providedFields) {
+      const newValue = body[field].trim();
+
+      if (target[field] !== newValue) {
+        target[field] = newValue;
+        hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      target.date = new Date().toISOString();
+    }
+
+    return res.status(200).json(target);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
+//############################ DELETE a specific post ############################
+app.delete("/posts/:id", (req, res) => {
+  try {
+    const rawId = req.params.id;
+    const id = Number(rawId);
+
+    if (!/^[1-9]\d*$/.test(rawId) || !Number.isSafeInteger(id)) {
+      return res.status(400).json({ message: "Invalid post ID" });
+    }
+
+    const index = posts.findIndex((post) => post.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    posts.splice(index, 1);
+
+    return res.sendStatus(204);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
 
 app.listen(port, () => {
   console.log(`API is running at http://localhost:${port}`);

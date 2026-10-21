@@ -40,7 +40,10 @@ app.get("/edit/:id", async (req, res) => {
       post: response.data,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching post" });
+    console.log(error);
+    res.status(500).json({
+      message: error.response?.data?.message ?? "Error fetching posts",
+    });
   }
 });
 
@@ -51,7 +54,9 @@ app.post("/api/posts", async (req, res) => {
     console.log(response.data);
     res.redirect("/");
   } catch (error) {
-    res.status(500).json({ message: "Error creating post" });
+    res.status(500).json({
+      message: error.response?.data?.message ?? "Error fetching posts",
+    });
   }
 });
 
@@ -66,7 +71,9 @@ app.post("/api/posts/:id", async (req, res) => {
     console.log(response.data);
     res.redirect("/");
   } catch (error) {
-    res.status(500).json({ message: "Error updating post" });
+    res.status(500).json({
+      message: error.response?.data?.message ?? "Error fetching posts",
+    });
   }
 });
 
@@ -76,7 +83,9 @@ app.get("/api/posts/delete/:id", async (req, res) => {
     await axios.delete(`${API_URL}/posts/${req.params.id}`);
     res.redirect("/");
   } catch (error) {
-    res.status(500).json({ message: "Error deleting post" });
+    res.status(500).json({
+      message: error.response?.data?.message ?? "Error fetching posts",
+    });
   }
 });
 
