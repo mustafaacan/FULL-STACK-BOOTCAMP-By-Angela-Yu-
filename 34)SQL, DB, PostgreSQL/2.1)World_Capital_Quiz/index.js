@@ -13,6 +13,8 @@ let dataCheckFirstTime = true;
 const DBCheck = async (req, response, next) => {
   // IF the data already obtained, do not try to obtain it again. Otherwise, there will be an error such
   // "Client has already been connected. You cannot reuse a client." even db connection closed succesfully.
+  // DO NOT FORGET that this method does not suitable for real time application since server will share the
+  // similar info with others and we cannot see the DB updates properly.
   if (!dataCheckFirstTime) {
     if (quiz.length === 0) {
       return response
@@ -122,6 +124,8 @@ app.post("/submit", (req, res) => {
   }
 
   nextQuestion();
+
+  console.log(currentQuestion);
 
   res.render("index.ejs", {
     question: currentQuestion,

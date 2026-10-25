@@ -148,3 +148,203 @@ CREATE TABLE employees (
     department_id INTEGER NOT NULL REFERENCES departments(id),
 );
 
+
+
+
+################################# DB USAGE IN EXPRESS ###########################################
+
+############################# WITHOUT POOL #######################################
+
+// with pooling methods, we can manage timeout durations and reconnect structures more accurately
+// for instance, 
+
+import pg from "pg";
+
+// GLOBAL DEFINITION or MIDDLEWARE DEFINITION
+
+const db = new pg.Client({
+    user: "postgres",
+    host: "localhost",
+    database: "World",
+    password: "mustafacan",
+    port: 5432,
+  });
+
+
+try {
+    await db.connect();
+
+    const result = await db.query("SELECT * FROM capitals");
+
+    quiz = result.rows;
+
+    if (quiz.length === 0) {
+      return response
+        .status(404)
+        .send("Query results is empty. Check the SQL query.");
+    }
+
+    console.log("The needed data obtained as below");
+    console.log(quiz);
+
+    return next();
+  } catch (error) {
+    console.error("Database connection or query error:", error);
+
+    return response
+      .status(500)
+      .send(
+        `Check the console log, especially connection credentials or SQL Query and restart the server.${error}`,
+      );
+  } finally {
+    try {
+      await db.end();
+    } catch (closeError) {
+      console.error("Database connection could not be closed:", closeError);
+    }
+  }
+};
+
+
+############################# WITH POOL #######################################
+
+// FULL EXAMPLE
+
+import express from "express";
+import pg from "pg";
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Create one shared connection pool when the application starts.
+// Set the PGPASSWORD environment variable before running this script.
+const pool = new pg.Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "World",
+  password: process.env.PGPASSWORD,
+  port: 5432,
+
+  max: 10, // Allow up to 10 connections in this pool.
+  idleTimeoutMillis: 30_000, // Close connections idle for 30 seconds.
+  connectionTimeoutMillis: 5_000, // Wait up to 5 seconds for a connection.
+  statement_timeout: 10_000, // PostgreSQL cancels statements exceeding 10 seconds.
+});
+
+// Handle unexpected errors on idle connections.
+// Errors from pool.query() are handled by the middleware below.
+pool.on("error", (error) => {
+  console.error("Unexpected error on an idle database connection:", error);
+});
+
+// Load quiz data before running routes that need it.
+async function loadQuiz(request, response, next) {
+  try {
+    // The pool acquires and releases the connection automatically.
+    const result = await pool.query("SELECT * FROM capitals");
+
+    // An empty result does not necessarily mean the SQL query is wrong.
+    if (result.rows.length === 0) {
+      return response.status(404).send("No quiz records were found.");
+    }
+
+    // Store the data on this request instead of a global variable.
+    request.quiz = result.rows;
+  } catch (error) {
+    console.error("Database connection or query error:", error);
+
+    return response
+      .status(500)
+      .send("An error occurred while loading the quiz.");
+  }
+
+  return next();
+}
+
+// Only routes using loadQuiz will run the database query.
+app.get("/", loadQuiz, (request, response) => {
+  response.json(request.quiz);
+});
+
+// This route does not need quiz data.
+app.get("/health", (request, response) => {
+  response.status(200).send("The HTTP server is running.");
+});
+
+const server = app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
+let shuttingDown = false;
+
+function shutdown(signal) {
+  // Prevent repeated signals from starting shutdown more than once.
+  if (shuttingDown) return;
+  shuttingDown = true;
+
+  console.log(`${signal} received. Shutting down...`);
+
+  // Stop accepting new connections and wait for active requests to finish.
+  server.close(async (serverError) => {
+    if (serverError) {
+      console.error("HTTP server shutdown error:", serverError);
+    }
+
+    try {
+      // Close the pool after active HTTP requests have finished.
+      await pool.end();
+      console.log("Database pool closed.");
+
+      process.exitCode = serverError ? 1 : 0;
+    } catch (error) {
+      console.error("Database pool shutdown error:", error);
+      process.exitCode = 1;
+    }
+  });
+}
+
+// Ctrl+C in the terminal.
+process.on("SIGINT", () => shutdown("SIGINT"));
+
+// A termination request from the operating system or hosting platform.
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+
+// These handlers cannot run after SIGKILL, power loss, or a sudden OS crash.
+// PostgreSQL cleans up disconnected sessions once it detects the disconnect.
+// Any uncommitted transaction in a disconnected session is rolled back.
+
+
+
+
+
+################################# POSSIBLE QUERY RESULTS ###########################################
+
+| Situation | What happens in JavaScript? | HTTP response in the example |
+| --- | --- | --- |
+1. Query succeeds and records are found | result.rows contains the records | 200, data: [{ ... }] |
+2. Query succeeds but no records are found | result.rows is an empty array | 200, data: [] |
+3. SQL is invalid or the connection fails | The promise rejects and catch runs | 500, an error message |
+
+An empty result is not a query error. For example, if no record matches:
+
+const result = await pool.query(
+  "SELECT * FROM capitals WHERE id = $1",
+  [999999],
+);
+
+console.log(result.rows); // [] if no record has this ID.
+
+However, if the table name is wrong:
+
+await pool.query("SELECT * FROM nonexistent_table");
+// Throws an error if the table does not exist -> execution moves to catch.
+
+PostgreSQL does not directly send HTTP 200 or 500 responses. You choose the
+HTTP response in your Express code based on the query result.
+
+
+
+

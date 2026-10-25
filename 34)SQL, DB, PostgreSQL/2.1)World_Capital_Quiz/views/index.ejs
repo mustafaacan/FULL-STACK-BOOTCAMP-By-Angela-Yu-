@@ -36,10 +36,10 @@
 
   </form>
   <script>
-    var wasCorrect = "<%= locals.wasCorrect %>";
+    const wasCorrect = "<%= locals.wasCorrect %>";
     console.log(wasCorrect)
     if (wasCorrect === "false") {
-      alert('Game over! Final best score: <%= locals.totalScore %>');
+      alert('Game over ! Answer was  <%= question.capital %>.  \n Final best score: <%= locals.totalScore %>');
       document.getElementById("app").innerHTML = '<a href="/" class="restart-button">Restart</a>'
     }
 
