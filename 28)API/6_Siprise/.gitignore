@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Environment variables and credentials
+.env
+.env.*
+!.env.example
+client_secret_*.json
+
+# Logs and Node.js diagnostic reports
+logs/
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Local caches
+.npm/
+.cache/
+.eslintcache
+.stylelintcache
+.node_repl_history
+
+# OS and editor temporary files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
