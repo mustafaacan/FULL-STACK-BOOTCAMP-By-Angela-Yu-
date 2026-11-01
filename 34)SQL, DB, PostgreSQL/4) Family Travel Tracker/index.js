@@ -11,22 +11,7 @@ import pg from "pg";
 
 // DIKKAT : URL ler için hangi methodların allowed olduklarını belirten yapıları kurman gerekiyor.
 
-// DİKKAT EDİLECEK BAZI HUSUSLAR
-// KULLANICI eklemenin bir sınırı olmalı mesela 7. kontrol için statüsü bir olan tüm kullanıcıların sayısını versin
-// kullanıcı seçerken rengini de alıyoruz zaten
-// kullanıcı silme olanağı da olmalı ve uyarı vermeli. bu yüzden kullanıcıları çekerken statüsü 1 olanları almak lazım
-// (opsiyonel) ülke çıkarma olayı da olsun
-// DB operasyonları hep aynı olacağı için bir tane genel fonksiyon olsun, diğer fonksiyonlar bu fonksiyona query yollasınlar.
-// Bu ana fonksiyon tüm kontrolleri yapsın. sistem dönütlerini versin
-// Önceki kodlardan işimize yaraynları kullanıcaz.
-// (Opsiyonel) bir hata sayfası da olsun olası bir hatada index.ejs yerine bunu yollasın
-// Dikkat: işlemler sırasında kullanıcı ID si global olarak tutulsun ki her işlemde onu kullanalım.
-// Yeni kullanıcı ekledikten sonra onun ID sini globale çekmeyi unutma.
-// kullanıcı silindikten sonra ilk gelen kullanıcıya yönlendir. eğer silinecek kullanıcı yoksa (en az 1 tane kullanıcı olmalı)
-// remove disable olmalı. yeni bir kullanıcı eklendiğinde her zaman remove tuşu aktif oluyor olmalı
 
-// ADD Member yazısının yanında sayaç olsun. max yedi olucak şuan kaç tane varsa onu da düşsün ve ekleme yapılabilecek sayıyı versin
-// örnek Add Family Member (5). Her silme işleminden sonra sayıyı arttırmayı unutma.
 
 const app = express();
 const port = 3000;
@@ -37,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // Maximum 7 users can be added
-const MAX_USERS = 3;
+const MAX_USERS = 7;
 const ALLOWED_COLORS = new Set([
   "green",
   "yellow",
