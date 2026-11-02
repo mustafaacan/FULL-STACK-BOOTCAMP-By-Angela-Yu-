@@ -11,6 +11,17 @@ have been used.For more detailed info please visit the page.
  */
 
 /*
+ALL THE NEEDED URL
+
+Random --> www.thecocktaildb.com/api/json/v1/1/random.php
+Alcholic --> www.thecocktaildb.com/api/json/v1/1/filter.php?a=Alcoholic
+Non-Alcholic --> www.thecocktaildb.com/api/json/v1/1/filter.php?a=Non_Alcoholic
+Ordinary Drink --> www.thecocktaildb.com/api/json/v1/1/filter.php?c=Ordinary_Drink
+coctail --> www.thecocktaildb.com/api/json/v1/1/filter.php?c=Cocktail
+
+ */
+
+/*
 REQUIRED CASES
 1) for probably error, we may use an error template
 2) common middlewares
@@ -25,8 +36,72 @@ REQUIRED CASES
 
 const app = express();
 const port = 3000;
+const timeOut = 5000;
 
 app.use(express.static("./public"));
+
+// ################# COMMON URLS ################
+
+const BASE_URL = "https://www.thecocktaildb.com/api/json/v1/1/";
+
+const endpoints = {
+  random: "random.php",
+  alcoholic: "filter.php?a=Alcoholic",
+  nonAlcoholic: "filter.php?a=Non_Alcoholic",
+  ordinaryDrink: "filter.php?c=Ordinary_Drink",
+  cocktail: "filter.php?c=Cocktail",
+  detail: "lookup.php?i=",
+};
+
+// ################# (MIDDLEWARE) DRINK FETCHING ################
+
+const fetchDrink = (category) => {
+  return async (req, res, next) => {
+    try {
+      // requesting according to category
+      const url = BASE_URL + endpoints[category];
+      const result = await axios.get(url, { timeout: timeOut });
+      if (
+        !Array.isArray(result.data.drinks) ||
+        result.data.drinks.length === 0
+      ) {
+        res.locals.error = "Drink list is Empty";
+        return next();
+      } else {
+        if (category === "random") {
+          if (!result.data.drinks[0]) {
+            res.locals.error = "Drink could not be obtained";
+            return next();
+          }
+          res.locals.drink = result.data.drinks[0];
+          return next();
+        }
+
+        // selecting random drink id
+        const drinks = result.data.drinks;
+        const randomIndex = Math.floor(Math.random() * drinks.length);
+        const randomDrink = drinks[randomIndex];
+        const drinkId = randomDrink?.idDrink;
+        if (!drinkId) {
+          res.locals.error = "Drink ID could not be obtained";
+          return next();
+        }
+        // drink detail according to ID
+        const detailURL = BASE_URL + endpoints["detail"] + drinkId;
+        const details = await axios.get(detailURL, { timeout: timeOut });
+        if (!Array.isArray(details.data.drinks) || !details.data.drinks[0]) {
+          res.locals.error = "Drink Info could not be obtained";
+          return next();
+        }
+        res.locals.drink = details.data.drinks[0];
+        return next();
+      }
+    } catch (err) {
+      res.locals.error = err.message;
+      return next();
+    }
+  };
+};
 
 // ################# (MIDDLEWARE) FOR DATA RENDER ################
 // Caution: will be used after related routes
@@ -67,37 +142,26 @@ const renderDrink = (req, res) => {
 };
 
 // ################################### ROUTES ##############################################
+
 // ################# INDEX  ######################
 app.get("/", (req, res) => {
   res.render("index.ejs"); // MISSING
 });
 
-// ################# RANDOM DRINK ################
-app.get(
-  "/random",
-  async (req, res, next) => {
-    try {
-      const url = new URL(
-        "https://www.thecocktaildb.com/api/json/v1/1/random.php",
-      );
-      const result = await axios.get(url);
+// ################# Alcholic DRINK ################
+app.get("/alcoholic", fetchDrink("alcoholic"), renderDrink);
 
-      if (
-        !Array.isArray(result.data.drinks) ||
-        result.data.drinks.length === 0
-      ) {
-        res.locals.error = "Random Drink Could not be found";
-      } else {
-        res.locals.drink = result.data.drinks[0];
-      }
-      return next();
-    } catch (err) {
-      res.locals.error = err.message;
-      next();
-    }
-  },
-  renderDrink,
-);
+// ################# Non-Alcholic DRINK ################
+app.get("/non-alcoholic", fetchDrink("nonAlcoholic"), renderDrink);
+
+// ################# Ordinary DRINK ################
+app.get("/ordinary-drink", fetchDrink("ordinaryDrink"), renderDrink);
+
+// ################# Non - Ordinary RANDOM DRINK ################
+app.get("/cocktail", fetchDrink("cocktail"), renderDrink);
+
+// ################# RANDOM DRINK ################
+app.get("/random", fetchDrink("random"), renderDrink);
 
 // ################################### SERVER INIT ##########################################
 const server = app.listen(port, () => {
