@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+<main id="main">
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span></span> THE ART OF THE UNEXPECTED</p>
+      <h1 id="hero-title">Your evening.<br />A new <em>twist.</em></h1>
+      <p class="hero-description">
+        Step away from your usual. Discover a cocktail worth slowing down for,
+        one unexpected pour at a time.
+      </p>
+      <a class="button" href="#discover"
+        >Find your next drink <span aria-hidden="true">↗</span></a
+      >
+      <p class="hero-footnote">CLASSIC RECIPES. FRESH POSSIBILITIES.</p>
+    </div>
+    <div class="hero-art">
+      <div class="cocktail-art" role="img"
+        aria-label="An amber cocktail with an orange garnish, illustrated on a dark bar">
+      <div class="halo"></div>
+      <div class="orange"></div>
+      <div class="glass">
+        <div class="liquid"></div>
+        <span class="ice ice-one"></span><span class="ice ice-two"></span
+        ><span class="glass-shine"></span>
+      </div>
+      <div class="glass-shadow"></div>
+      </div>
+      <p class="art-caption"><i>Always in good taste.</i></p>
+    </div>
+  </section>
+  <section
+    class="discovery wrap"
+    id="discover"
+    aria-labelledby="discover-title"
+  >
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">LET CURIOSITY ORDER</p>
+        <h2 id="discover-title">What’s your mood?</h2>
+      </div>
+      <p>Choose a direction. We’ll find the drink.</p>
+    </div>
+    <form id="drink-form" class="drink-form">
+      <label for="category">Your preference</label>
+      <div class="form-controls">
+        <select id="category" name="category">
+          <option value="random">Anything goes — surprise me</option>
+          <option value="cocktail">Cocktails</option>
+          <option value="ordinary-drink">Ordinary drinks</option>
+          <option value="alcoholic">With alcohol</option>
+          <option value="non-alcoholic">Without alcohol</option>
+        </select>
+        <button class="button" type="submit">Surprise me</button>
+      </div>
+    </form>
+    <p id="drink-status" class="status" role="status" aria-live="polite">
+      Your next favorite is one pour away.
+    </p>
+    <noscript><p>Enable JavaScript to discover a drink here.</p></noscript>
+    <article class="drink-result" id="drink-result" aria-labelledby="drink-name" hidden>
+      <div class="drink-image-wrap">
+        <img id="drink-image" alt="" loading="lazy">
+        <span class="image-placeholder" id="image-placeholder" hidden>siprise ✦</span>
+      </div>
+      <div class="recipe">
+        <p class="eyebrow">YOUR NEXT DISCOVERY</p>
+        <h2 id="drink-name" tabindex="-1"></h2>
+        <h3>The ingredients</h3>
+        <ul id="drink-ingredients"></ul>
+        <h3>The method</h3>
+        <p id="drink-instructions"></p>
+        <a id="drink-video" target="_blank" rel="noopener noreferrer" hidden>Watch the preparation ↗</a>
+      </div>
+    </article>
+  </section>
+  <section class="ritual wrap" id="ritual" aria-labelledby="ritual-title">
+    <span class="ritual-mark" aria-hidden="true">✦</span>
+    <p class="eyebrow">MAKE A MOMENT OF IT</p>
+    <h2 id="ritual-title">Less routine. <em>More ritual.</em></h2>
+    <p>
+      The right glass. A few good ingredients. A little time to yourself.<br />Sometimes,
+      that’s all an evening needs.
+    </p>
+  </section>
+</main>
+<%- include('partials/footer') %>

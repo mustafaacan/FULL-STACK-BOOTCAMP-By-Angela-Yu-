@@ -1,14 +1,35 @@
 import axios from "axios";
 import express from "express";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-/*
-In this project, we retrieve data from a third-party API through server-side requests.
-For this trial, the  from 
-
-https://www.thecocktaildb.com/api.php 
-
-have been used.For more detailed info please visit the page.
+/**
+ * Siprise — Cocktail Discovery
+ *
+ * Express application that serves an EJS interface and retrieves drink recipes
+ * from TheCocktailDB through server-side Axios requests.
+ *
+ * Users can discover a random drink or choose a category. Category requests
+ * select a drink from the filtered list, then retrieve its full recipe.
+ * Successful responses provide the frontend with drink details, ingredients,
+ * and preparation instructions for display on the home page.
+ *
+ * Request failures use JSON or an EJS error page according to the client's
+ * accepted response format. Unmatched routes and methods receive a 404 page;
+ * unexpected request errors are handled by the final error middleware.
+ *
+ * API documentation: https://www.thecocktaildb.com/api.php
  */
+
+const app = express();
+const projectDir = path.dirname(fileURLToPath(import.meta.url));
+const port = 3000;
+const timeOut = 5000;
+
+app.use(express.static(path.join(projectDir, "public")));
+app.set("views", path.join(projectDir, "views"));
+
+// ################# COMMON URLS ################
 
 /*
 ALL THE NEEDED URL
@@ -20,27 +41,6 @@ Ordinary Drink --> www.thecocktaildb.com/api/json/v1/1/filter.php?c=Ordinary_Dri
 coctail --> www.thecocktaildb.com/api/json/v1/1/filter.php?c=Cocktail
 
  */
-
-/*
-REQUIRED CASES
-1) for probably error, we may use an error template
-2) common middlewares
-3) common routes structure for similar cases
-4) There should be also A MIDDLEWARE that handle the requested api and responses
-5) Chack the missing parts
-6) Add the allowed method limitor to prevent unwanted methods for the routes
-7) On the index page, we can mention about the https://www.thecocktaildb.com/api.php  also on the footer tab
-8) Be sure that the necessary global variables defined such URLs
-9) Possible Server error should be analyzed more detailed.
- */
-
-const app = express();
-const port = 3000;
-const timeOut = 5000;
-
-app.use(express.static("./public"));
-
-// ################# COMMON URLS ################
 
 const BASE_URL = "https://www.thecocktaildb.com/api/json/v1/1/";
 
@@ -55,25 +55,39 @@ const endpoints = {
 
 // ################# (MIDDLEWARE) DRINK FETCHING ################
 
-const fetchDrink = (category) => {
+const fetchCategory = (category) => {
   return async (req, res, next) => {
     try {
+      // Provided category name should be included by endpoint object
+      // Since detail endpoint is not necessary, we need to eliminate it
+      const endpointList = Object.keys(endpoints).filter(
+        (item) => item !== "detail",
+      );
+      if (!endpointList.includes(category)) {
+        res.locals.error = "Invalid category request";
+        res.locals.statusCode = 500;
+        return next();
+      }
+
       // requesting according to category
       const url = BASE_URL + endpoints[category];
       const result = await axios.get(url, { timeout: timeOut });
       if (
-        !Array.isArray(result.data.drinks) ||
+        !Array.isArray(result.data?.drinks) ||
         result.data.drinks.length === 0
       ) {
         res.locals.error = "Drink list is Empty";
+        res.locals.statusCode = 502;
         return next();
       } else {
         if (category === "random") {
-          if (!result.data.drinks[0]) {
-            res.locals.error = "Drink could not be obtained";
+          const drink = result.data.drinks[0];
+          if (!drink?.idDrink || !drink?.strDrink) {
+            res.locals.error = "Drink data is incomplete.";
+            res.locals.statusCode = 502;
             return next();
           }
-          res.locals.drink = result.data.drinks[0];
+          res.locals.drink = drink;
           return next();
         }
 
@@ -84,20 +98,44 @@ const fetchDrink = (category) => {
         const drinkId = randomDrink?.idDrink;
         if (!drinkId) {
           res.locals.error = "Drink ID could not be obtained";
+          res.locals.statusCode = 502;
           return next();
         }
         // drink detail according to ID
         const detailURL = BASE_URL + endpoints["detail"] + drinkId;
         const details = await axios.get(detailURL, { timeout: timeOut });
-        if (!Array.isArray(details.data.drinks) || !details.data.drinks[0]) {
+        if (!Array.isArray(details.data?.drinks) || !details.data.drinks[0]) {
           res.locals.error = "Drink Info could not be obtained";
+          res.locals.statusCode = 502;
           return next();
         }
-        res.locals.drink = details.data.drinks[0];
+        const drink = details.data.drinks[0];
+        if (!drink?.idDrink || !drink?.strDrink) {
+          res.locals.error = "Drink data is incomplete.";
+          res.locals.statusCode = 502;
+          return next();
+        }
+        res.locals.drink = drink;
         return next();
       }
     } catch (err) {
-      res.locals.error = err.message;
+      console.error("fetchCategory failed:", err);
+
+      if (
+        // timeout error
+        axios.isAxiosError(err) &&
+        ["ECONNABORTED", "ETIMEDOUT"].includes(err.code)
+      ) {
+        res.locals.statusCode = 504;
+        res.locals.error = "The drink service took too long to respond.";
+      } else if (axios.isAxiosError(err)) {
+        res.locals.statusCode = 502;
+        res.locals.error =
+          "The drink service could not be reached successfully.";
+      } else {
+        res.locals.statusCode = 500;
+        res.locals.error = "An unexpected error occurred.";
+      }
       return next();
     }
   };
@@ -107,7 +145,12 @@ const fetchDrink = (category) => {
 // Caution: will be used after related routes
 const renderDrink = (req, res) => {
   if (res.locals.error !== undefined) {
-    return res.render("error.ejs");
+    if (req.accepts(["html", "json"]) === "json") {
+      return res
+        .status(res.locals.statusCode ?? 500)
+        .json({ error: res.locals.error });
+    }
+    return res.status(res.locals.statusCode ?? 500).render("error.ejs");
   }
 
   // ingredient with measures
@@ -121,47 +164,85 @@ const renderDrink = (req, res) => {
     })
     .map((key) => {
       const number = key.replace("strIngredient", "");
+      const ingredient = res.locals.drink[key];
+      const measure = res.locals.drink[`strMeasure${number}`];
 
       return {
-        ingredient: res.locals.drink[key]?.trim() ?? "",
+        ingredient: typeof ingredient === "string" ? ingredient.trim() : "",
         measure:
-          res.locals.drink[`strMeasure${number}`]?.trim() || "Not specified",
+          (typeof measure === "string" ? measure.trim() : "") ||
+          "Not specified",
       };
     })
     .filter((item) => item.ingredient !== "");
 
+  const instructions = res.locals.drink.strInstructions;
   const drink = {
     name: res.locals.drink.strDrink ?? "Unknown",
     image: res.locals.drink.strDrinkThumb ?? "",
     video: res.locals.drink.strVideo ?? "",
-    desc: res.locals.drink.strInstructions ?? "There is no Instructions",
+    desc:
+      (typeof instructions === "string" ? instructions.trim() : "") ||
+      "No instructions available.",
     ingreds: ingredients,
   };
 
-  res.status(200).json(drink); // MISSING
+  res.status(200).json(drink);
 };
 
 // ################################### ROUTES ##############################################
 
-// ################# INDEX  ######################
+//  INDEX
 app.get("/", (req, res) => {
-  res.render("index.ejs"); // MISSING
+  res.render("index.ejs");
 });
 
-// ################# Alcholic DRINK ################
-app.get("/alcoholic", fetchDrink("alcoholic"), renderDrink);
+// Display errors without making the failed drink request again.
+app.get("/error", (req, res) => {
+  const status = Number(req.query.status);
+  const statusCode = [400, 500, 502, 504].includes(status) ? status : 500;
+  const error =
+    typeof req.query.message === "string"
+      ? req.query.message.slice(0, 300)
+      : "An unexpected error occurred. Please try again.";
+  res.status(statusCode).render("error.ejs", { error });
+});
 
-// ################# Non-Alcholic DRINK ################
-app.get("/non-alcoholic", fetchDrink("nonAlcoholic"), renderDrink);
+// Alcholic DRINK
+app.get("/alcoholic", fetchCategory("alcoholic"), renderDrink);
 
-// ################# Ordinary DRINK ################
-app.get("/ordinary-drink", fetchDrink("ordinaryDrink"), renderDrink);
+//  Non-Alcholic DRINK
+app.get("/non-alcoholic", fetchCategory("nonAlcoholic"), renderDrink);
 
-// ################# Non - Ordinary RANDOM DRINK ################
-app.get("/cocktail", fetchDrink("cocktail"), renderDrink);
+//  Ordinary DRINK
+app.get("/ordinary-drink", fetchCategory("ordinaryDrink"), renderDrink);
 
-// ################# RANDOM DRINK ################
-app.get("/random", fetchDrink("random"), renderDrink);
+//  Non - Ordinary RANDOM DRINK
+app.get("/cocktail", fetchCategory("cocktail"), renderDrink);
+
+//  RANDOM DRINK
+app.get("/random", fetchCategory("random"), renderDrink);
+
+// Unmatched paths and HTTP methods use the same 404 page.
+app.use((req, res) => {
+  return res.status(404).render("404.ejs");
+});
+
+// Handle unexpected request errors after all routes and the 404 handler.
+app.use((err, req, res, next) => {
+  console.error("Unexpected request error:", err);
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  const error = "An unexpected error occurred. Please try again.";
+  if (req.accepts(["html", "json"]) === "json") {
+    return res.status(500).json({ error });
+  }
+
+  return res.status(500).render("error.ejs", { error });
+});
 
 // ################################### SERVER INIT ##########################################
 const server = app.listen(port, () => {
