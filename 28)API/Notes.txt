@@ -1,4 +1,16 @@
 
+****
+
+FOR MORE PRACTICE, PLEASE FOLLOW,
+
+https://www.udemy.com/course/the-complete-web-development-bootcamp/learn/lecture/38892394?start=0#overview (PUBLIC APIs)
+
+https://github.com/appbrewery/public-api-lists
+
+****
+
+
+
 APPLICATION PROGRAM INTERFACE (API)
 
 These are structures used for data exchange between programs with different or similar architectures. Kind of Brigde
