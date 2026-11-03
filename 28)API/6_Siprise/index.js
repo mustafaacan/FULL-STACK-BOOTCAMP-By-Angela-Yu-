@@ -223,10 +223,14 @@ app.get("/cocktail", fetchCategory("cocktail"), renderDrink);
 //  RANDOM DRINK
 app.get("/random", fetchCategory("random"), renderDrink);
 
+// ################################### 404 PAGE ##############################################
+
 // Unmatched paths and HTTP methods use the same 404 page.
 app.use((req, res) => {
   return res.status(404).render("404.ejs");
 });
+
+// ################################### ERROR MIDDLEWARE ##############################################
 
 // Handle unexpected request errors after all routes and the 404 handler.
 app.use((err, req, res, next) => {
