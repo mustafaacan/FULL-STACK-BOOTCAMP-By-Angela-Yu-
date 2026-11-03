@@ -1,3 +1,16 @@
+
+****
+
+FOR MORE PRACTICE, PLEASE FOLLOW,
+
+https://www.udemy.com/course/the-complete-web-development-bootcamp/learn/lecture/38892394?start=0#overview (PUBLIC APIs)
+
+https://github.com/appbrewery/public-api-lists
+
+****
+
+
+
 CRITICAL USAGE INFORMATION
 
 if there will be a "IF - Clause" then "return" keyword should be used. Otherwise, Error can be seen
