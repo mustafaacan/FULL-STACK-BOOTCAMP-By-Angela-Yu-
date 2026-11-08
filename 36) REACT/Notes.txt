@@ -1,5 +1,8 @@
 REACT
 
+THE WEBSITE --> https://react.dev/reference/react
+
+
  the most powerful advantage of the React dividing the whole structure and managing is more easy. 
  For instance, assume that there are lots of products with details such picture or price. Wıth creating one sample can be used within
  the page as component. with using props feature for component and using a loop, many products can be rendered at once.
