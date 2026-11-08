@@ -1,7 +1,59 @@
 REACT
 
+############################# USEFUL WEBSITES ###################################
+
 THE WEBSITE --> https://react.dev/reference/react
 
+
+ONLINE WORKING AREA (Similar to Google Colab for Python)
+// The most efficent way, without create any react library, we can quickly build any project
+// similar to working on VS code environment. codesandbox can handle the library ops and their versions.
+
+https://codesandbox.io/  (Note to myself, Google authentication has used.)
+
+
+
+JSX TO JS Compiler (Converts the JS to more simple way so every browser can run it on the system)
+https://babeljs.io/
+
+
+
+HTML TO JSX 
+https://transform.tools/html-to-jsx
+
+
+
+UDEMY COURSES
+https://www.udemy.com/course/the-complete-web-development-bootcamp/learn/lecture/17038636#questions
+
+
+
+
+############################# IMPORTANT NOTE ###################################
+
+Until 2025, the most useful method to create React app quickly
+
+-- npx create-react-app <My App Name>
+
+however, in 2025, React Community just inform that "npx create-react-app" has depricated and it should be used Vite.
+
+// For React + Vite
+
+cd my-app
+npm install (For necessary node modules)
+npm run dev
+
+// For Typescript
+npm create vite@latest my-app -- --template react-ts
+
+// *** PRE-REQUEST --> FOR USING HOMEBREW, be sure brew is updated and all the packages are upgraded.
+
+brew update
+brew upgrade node (or just "brew upgrade" for all outdated packages)
+
+
+
+############################# BASIC DEFINITION & EXAMPLES ###################################
 
  the most powerful advantage of the React dividing the whole structure and managing is more easy. 
  For instance, assume that there are lots of products with details such picture or price. Wıth creating one sample can be used within
@@ -88,3 +140,13 @@ function Products() {
 }
 
 export default Products;
+
+
+
+
+############################# IMPORTANT NOTE ###################################
+
+CAUTION: Using Div element for multiple tags is essential. Use the div element as can as we on JSX structures.
+
+
+
